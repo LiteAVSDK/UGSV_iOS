@@ -84,6 +84,10 @@ typedef  NS_ENUM(NSInteger,VideoType)
     self.navigationController.interactivePopGestureRecognizer.enabled = NO;
 }
 
+- (BOOL)shouldAutorotate {
+    return NO;
+}
+
 - (void)viewWillDisappear:(BOOL)animated
 {
     [super viewWillDisappear:animated];
@@ -173,7 +177,6 @@ typedef  NS_ENUM(NSInteger,VideoType)
         _fileSize   = videoMsg.fileSize;
         _duration = videoMsg.duration;
         _rightTime = _duration;
-        _renderRotation = videoMsg.angle;
         rotateButtonCenter = CGPointMake(_videoCutView.ugckit_right - 20, _videoCutView.ugckit_top - 20);
     } else {
         //image

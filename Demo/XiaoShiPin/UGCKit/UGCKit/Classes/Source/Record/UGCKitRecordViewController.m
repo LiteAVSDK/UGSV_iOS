@@ -132,7 +132,8 @@ YTSDKLogListener,TXVideoCustomProcessDelegate,TXVideoCustomProcessListener
     NSObject*                 _BGMPath;
     CGFloat                   _BGMDuration;
     CGFloat                   _recordTime;
-    
+    float                     _micVolume;
+
     int                       _deleteCount;
     float                     _zoom;
     BOOL                      _isBackDelete;
@@ -206,35 +207,37 @@ YTSDKLogListener,TXVideoCustomProcessDelegate,TXVideoCustomProcessListener
 }
 //处理纹理，接入第三方美颜
 - (GLuint)onPreProcessTexture:(GLuint)texture width:(CGFloat)width height:(CGFloat)height{
-    if(!_xMagicKit){
-           [self buildBeautySDK:(int)width and:(int)height texture:texture];
-           self.heightF = height;
-       }
-       if(_xMagicKit != nil && self.heightF != height){
-           [_xMagicKit setRenderSize:CGSizeMake(width, height)];
-       }
-       YTProcessInput *input = [[YTProcessInput alloc] init];
-       input.textureData = [[YTTextureData alloc] init];
-       input.textureData.texture = texture;
-       input.textureData.textureWidth = width;
-       input.textureData.textureHeight = height;
-       input.dataType = kYTTextureData;
-       
-       EAGLContext* cloudContext = [EAGLContext currentContext];
-       EAGLContext* xmagicContext = [self.xMagicKit getCurrentGlContext];
-       
-       if(cloudContext != xmagicContext){
-           [EAGLContext setCurrentContext: xmagicContext];
-       }
-       
-       YTProcessOutput *output =[self.xMagicKit process:input withOrigin:YtLightImageOriginTopLeft withOrientation:YtLightCameraRotation0];
-       
-       if(cloudContext != xmagicContext){
-           [EAGLContext setCurrentContext: cloudContext];
-       }
-       
-      return output.textureData.texture;
+    if(!_xMagicKit) {
+        [self buildBeautySDK:(int)width and:(int)height texture:texture];
+        self.lastRenderWidth = width;
+        self.lastRenderHeight = height;
+    }
+   if(_xMagicKit != nil && (self.lastRenderHeight != height || self.lastRenderWidth != width) ) {
+       [_xMagicKit setRenderSize:CGSizeMake(width, height)];
+       self.lastRenderWidth = width;
+       self.lastRenderHeight = height;
+   }
+   YTProcessInput *input = [[YTProcessInput alloc] init];
+   input.textureData = [[YTTextureData alloc] init];
+   input.textureData.texture = texture;
+   input.textureData.textureWidth = width;
+   input.textureData.textureHeight = height;
+   input.dataType = kYTTextureData;
 
+   EAGLContext* cloudContext = [EAGLContext currentContext];
+   EAGLContext* xmagicContext = [self.xMagicKit getCurrentGlContext];
+
+   if(cloudContext != xmagicContext){
+       [EAGLContext setCurrentContext: xmagicContext];
+   }
+
+   YTProcessOutput *output =[self.xMagicKit process:input withOrigin:YtLightImageOriginTopLeft withOrientation:YtLightCameraRotation0];
+
+   if(cloudContext != xmagicContext){
+       [EAGLContext setCurrentContext: cloudContext];
+   }
+
+  return output.textureData.texture;
 }
 
 - (void)onLog:(YtSDKLoggerLevel) loggerLevel withInfo:(NSString * _Nonnull) logInfo{
@@ -246,7 +249,7 @@ YTSDKLogListener,TXVideoCustomProcessDelegate,TXVideoCustomProcessListener
 }
 - (void)onTipsEvent:(id)event
 {
-    
+
 }
 - (void)onAIEvent:(id)event
 {
@@ -344,6 +347,7 @@ YTSDKLogListener,TXVideoCustomProcessDelegate,TXVideoCustomProcessListener
     _recordState = RecordStateStopped;
 
     _currentRecordTime = 0;
+    _micVolume = 1.0;
 
     _speedMode = SpeedMode_Standard;
 
@@ -369,7 +373,8 @@ YTSDKLogListener,TXVideoCustomProcessDelegate,TXVideoCustomProcessListener
     [super viewDidLoad];
     _initData = FALSE;
     self.xMagicKit = nil;
-    self.heightF = 0;
+    self.lastRenderWidth = 0;
+    self.lastRenderHeight = 0;
     [self initUI];
 //    buildBeautySDK
     [self initBeautyUI];
@@ -526,6 +531,7 @@ YTSDKLogListener,TXVideoCustomProcessDelegate,TXVideoCustomProcessListener
     _controlView.speedControlEnabled = NO;
 #endif
     _controlView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+    _controlView.isFrontCamera = _isFrontCamera;
     [_controlView setupViews];
     [self.view addSubview:_controlView];
 
@@ -560,7 +566,7 @@ YTSDKLogListener,TXVideoCustomProcessDelegate,TXVideoCustomProcessListener
 
     UIPinchGestureRecognizer* pinchGensture = [[UIPinchGestureRecognizer alloc] initWithTarget:self action:@selector(onPInchZoom:)];
     [self.view addGestureRecognizer:pinchGensture];
-    
+
     if (UGCKitRecordStyleDuet == _config.recordStyle) { // 分屏合拍
         videoContainer.frame = CGRectMake(0, CGRectGetMaxY(_btnNext.frame) + 20,
                                           CGRectGetWidth(self.view.bounds),
@@ -631,7 +637,12 @@ YTSDKLogListener,TXVideoCustomProcessDelegate,TXVideoCustomProcessListener
     if (_musicView) {
         return _musicView;
     }
-    _musicView = [[UGCKitVideoRecordMusicView alloc] initWithFrame:CGRectMake(0, self.view.ugckit_bottom - 268 * kScaleY, self.view.ugckit_width, 268 * kScaleY) needEffect:YES theme:_theme];
+    _musicView = [[UGCKitVideoRecordMusicView alloc]
+                  initWithFrame:CGRectMake(0, self.view.ugckit_bottom - 268 * kScaleY, self.view.ugckit_width, 268 * kScaleY)
+                  needEffect:YES
+                  needVoiceSetting:NO
+                  theme:_theme];
+    
     _musicView.delegate = self;
     _musicView.hidden = YES;
     [self.view addSubview:_musicView];
@@ -855,12 +866,13 @@ YTSDKLogListener,TXVideoCustomProcessDelegate,TXVideoCustomProcessListener
         [_controlView.progressView comfirmDeletePart];
         [[TXUGCRecord shareInstance].partsManager deleteLastPart];
         _isBackDelete = YES;
-        if (0 == [TXUGCRecord shareInstance].partsManager.getVideoPathList.count) {
-            _bgmRecording = NO;
-            _BGMPath = nil;
-            [[TXUGCRecord shareInstance] stopBGM];
-            [_bgmListVC clearSelectStatus];
-        }
+// 删除最后一个片段，音乐也不要重置
+//        if (0 == [TXUGCRecord shareInstance].partsManager.getVideoPathList.count) {
+//            _bgmRecording = NO;
+//            _BGMPath = nil;
+//            [[TXUGCRecord shareInstance] stopBGM];
+//            [_bgmListVC clearSelectStatus];
+//        }
     }
     if (2 == ++ _deleteCount) {
         _deleteCount = 0;
@@ -1015,8 +1027,8 @@ YTSDKLogListener,TXVideoCustomProcessDelegate,TXVideoCustomProcessListener
         _countDownTimer = nil;
         _countDownView.hidden = YES;
         _controlView.recordButtonStyle = UGCKitRecordButtonStylePause;
-        _controlView.recordButtonSwitchControl.selectedIndex = CaptureModeTap;
-        self.captureMode = CaptureModeTap;
+//        _controlView.recordButtonSwitchControl.selectedIndex = CaptureModeTap;
+//        self.captureMode = CaptureModeTap;
         [self startRecord];
         [self hideBottomView:NO];
     }
@@ -1170,7 +1182,8 @@ YTSDKLogListener,TXVideoCustomProcessDelegate,TXVideoCustomProcessListener
 
 - (void)startRecord {
     if (_recordTime >= _config.maxDuration) {
-        // 已经录制到最大时长
+        // 如果到达长度了，继续录制，那进入结束状态
+        [self _finishRecord];
         return;
     }
 
@@ -1184,14 +1197,15 @@ YTSDKLogListener,TXVideoCustomProcessDelegate,TXVideoCustomProcessListener
 
     [self syncSpeedRateToSDK];
 
-    [[TXUGCRecord shareInstance] resumeRecord];
+    // 先恢复BGM，再恢复录制，减少分段时候可能出现BGM空白引起不连续问题
     if (_bgmRecording) {
         [self resumeBGM];
     }else{
         [self playBGM:_bgmBeginTime toTime:MAXFLOAT recordSpeed:[self getRecordSpeed]];
         _bgmRecording = YES;
     }
-    
+    [[TXUGCRecord shareInstance] resumeRecord];
+
     [self _configButtonToPause];
 
     if (_deleteCount == 1) {
@@ -1360,7 +1374,7 @@ YTSDKLogListener,TXVideoCustomProcessDelegate,TXVideoCustomProcessListener
         }
         
         if (!self->_isFromMusicSelectVC) {
-    
+
         }
         
 #if POD_PITU
@@ -1486,10 +1500,7 @@ YTSDKLogListener,TXVideoCustomProcessDelegate,TXVideoCustomProcessListener
     NSString * recordVideoPath = self.previewController.recordVideoPath;
     if (0 == recordVideoPath.length
         || 0 == _config.chorusVideos.count
-        || ![[NSFileManager defaultManager] fileExistsAtPath:recordVideoPath]
-        || ![[NSFileManager defaultManager] fileExistsAtPath:_config.chorusVideos.firstObject]
-        || (UGCKitRecordStyleTrio == _config.recordStyle
-            && (_config.chorusVideos.count < 2 || ![[NSFileManager defaultManager] fileExistsAtPath:_config.chorusVideos[1]]))) {
+        || ![[NSFileManager defaultManager] fileExistsAtPath:recordVideoPath]) {
         [self alert:[_theme localizedString:@"UGCKit.Media.HintVideoSynthesizeFailed"]
                 msg:[_theme localizedString:@"UGCKit.Record.TryAgain"]];
         return;
@@ -1554,6 +1565,8 @@ YTSDKLogListener,TXVideoCustomProcessDelegate,TXVideoCustomProcessListener
         CGPoint _touchPoint = [[[event allTouches] anyObject] locationInView:self.view];
         if (NO == CGRectContainsPoint(_musicView.frame, _touchPoint)){
             _musicView.hidden = YES;
+            // 隐藏面板的时候，停止播放音乐，否者录制时候开始会有一点点杂音
+            [[TXUGCRecord shareInstance] stopBGM];
             [self hideBottomView:NO];
         }
     }
@@ -1622,8 +1635,9 @@ YTSDKLogListener,TXVideoCustomProcessDelegate,TXVideoCustomProcessListener
         {
             if (result.retCode != UGC_RECORD_RESULT_FAILED && _isStopRecord) {
                 [self onFinishRecord:(int)result.retCode];
-            }else{
-                [self toastTip:[_theme localizedString:@"UGCKit.Record.ErrorREC"]];
+            } else {
+               // [self toastTip:[_theme localizedString:@"UGCKit.Record.ErrorREC"]];
+                NSLog(@"onRecordComplete failed: %@", [_theme localizedString:@"UGCKit.Record.ErrorREC"]);
             }
         }
     }
@@ -1768,6 +1782,7 @@ YTSDKLogListener,TXVideoCustomProcessDelegate,TXVideoCustomProcessListener
 -(void)onVoiceValueChange:(CGFloat)value
 {
     [[TXUGCRecord shareInstance] setMicVolume:value];
+    _micVolume = value;
 }
 
 -(void)onBGMRangeChange:(CGFloat)startPercent endPercent:(CGFloat)endPercent
@@ -1819,6 +1834,9 @@ YTSDKLogListener,TXVideoCustomProcessDelegate,TXVideoCustomProcessListener
             
         }];
         _bgmBeginTime = beginTime;
+        [[TXUGCRecord shareInstance] setMicVolume:0];
+    } else {
+        [[TXUGCRecord shareInstance] setMicVolume:_micVolume];
     }
 }
 
@@ -1865,7 +1883,7 @@ YTSDKLogListener,TXVideoCustomProcessDelegate,TXVideoCustomProcessListener
 
 - (void)onPanSlideFilter:(UIPanGestureRecognizer*)recognizer
 {
-   
+
 }
 
 - (void)animateFromFilter1:(UIImage*)filter1Image filter2:(UIImage*)filter2Image filter1MixLevel:(CGFloat)filter1MixLevel filter2MixLevel:(CGFloat)filter2MixLevel leftRadio:(CGFloat)leftRadio speed:(CGFloat)speed completion:(void(^)(void))completion
@@ -1903,9 +1921,9 @@ YTSDKLogListener,TXVideoCustomProcessDelegate,TXVideoCustomProcessListener
 
 - (void)uinit{
     _isStopRecord = YES;
-    [[TXUGCRecord shareInstance] stopRecord];
     [[TXUGCRecord shareInstance] stopCameraPreview];
     [[TXUGCRecord shareInstance].partsManager deleteAllParts];
+    [[TXUGCRecord shareInstance] stopRecord];
     [[TXUGCRecord shareInstance] setReverbType:VIDOE_REVERB_TYPE_0];
     [[TXUGCRecord shareInstance] setVoiceChangerType:VIDOE_VOICECHANGER_TYPE_0];
     _recordState = RecordStateStopped;
@@ -1964,7 +1982,8 @@ YTSDKLogListener,TXVideoCustomProcessDelegate,TXVideoCustomProcessListener
     
     UGCKitRecordStyle _recordStyle;
     
-    NSArray<TXVideoEditer *> *_videoPlayers;
+//    NSArray<TXVideoEditer *> *_videoPlayers;
+    NSArray<TXVodPlayer*> *_videoPlayers;
 }
 
 - (instancetype)initWithContainerView:(UIView *)containerView
@@ -2000,7 +2019,7 @@ YTSDKLogListener,TXVideoCustomProcessDelegate,TXVideoCustomProcessListener
         return;
     }
     
-    NSMutableArray<TXVideoEditer *> *videoPlayers = [NSMutableArray arrayWithCapacity:chorusVideos.count];
+    NSMutableArray<TXVodPlayer *> *videoPlayers = [NSMutableArray arrayWithCapacity:chorusVideos.count];
     void (^allocVideoPlayer)(UIView *, CGRect, NSString *, UIViewAutoresizing) = ^(UIView *containerView,
                                                                                    CGRect frame, NSString *videoPath,
                                                                                    UIViewAutoresizing autoresizingMask) {
@@ -2008,13 +2027,15 @@ YTSDKLogListener,TXVideoCustomProcessDelegate,TXVideoCustomProcessListener
         playerView.autoresizingMask = autoresizingMask;
         [containerView addSubview:playerView];
         
-        TXPreviewParam *param = [[TXPreviewParam alloc] init];
-        param.renderMode = PREVIEW_RENDER_MODE_FILL_SCREEN;
-        param.videoView = playerView;
-        
-        TXVideoEditer *videoPlayer = [[TXVideoEditer alloc] initWithPreview:param];
-        [videoPlayer setVideoPath:videoPath];
-        [videoPlayers addObject:videoPlayer];
+        TXVodPlayer* vodPlayer = [[TXVodPlayer alloc] init];
+        [vodPlayer setupVideoWidget:playerView insertIndex:0];
+        [vodPlayer setRenderMode:RENDER_MODE_FILL_SCREEN];
+        TXVodPlayConfig* config = [[TXVodPlayConfig alloc] init];
+        [vodPlayer setConfig:config];
+        [vodPlayer setIsAutoPlay:NO];
+        [vodPlayer startVodPlay:videoPath];
+        [vodPlayer pause];
+        [videoPlayers addObject:vodPlayer];
     };
     
     NSMutableArray<NSString *> *allVideoPaths = [NSMutableArray arrayWithCapacity:chorusVideos.count + 1];
@@ -2065,7 +2086,7 @@ YTSDKLogListener,TXVideoCustomProcessDelegate,TXVideoCustomProcessListener
                                                     | UIViewAutoresizingFlexibleHeight
                                                     | UIViewAutoresizingFlexibleTopMargin;
                 allocVideoPlayer(_containerView, playerRect, videoPath, autoresizingMask);
-                [videoPlayers.lastObject setVideoVolume:0];
+                [videoPlayers.lastObject setAudioPlayoutVolume:0];
                 [allVideoPaths addObject:(videoPath ? videoPath : @"")];
             }
         }
@@ -2096,10 +2117,10 @@ YTSDKLogListener,TXVideoCustomProcessDelegate,TXVideoCustomProcessListener
         return;
     }
     
-    for (TXVideoEditer *videoPlayer in _videoPlayers) {
+    for (TXVodPlayer *videoPlayer in _videoPlayers) {
         [videoPlayer stopPlay];
-        [videoPlayer setVideoPath:videoPath];
-        [videoPlayer previewAtTime:0];
+        [videoPlayer startVodPlay:videoPath];
+        [videoPlayer pause];
     }
     
     if (UGCKitRecordStyleDuet == _recordStyle) {
@@ -2113,22 +2134,25 @@ YTSDKLogListener,TXVideoCustomProcessDelegate,TXVideoCustomProcessListener
 
 - (void)startPlayChorusVideos:(CGFloat)startTime toTime:(CGFloat)endTime
 {
-    for (TXVideoEditer *videoPlayer in _videoPlayers) {
-        [videoPlayer startPlayFromTime:startTime toTime:endTime];
+    for (TXVodPlayer *videoPlayer in _videoPlayers) {
+        [videoPlayer seek:startTime];
+        [videoPlayer resume];
     }
 }
 
 - (void)stopPlayChorusVideos
 {
-    for (TXVideoEditer *videoPlayer in _videoPlayers) {
-        [videoPlayer stopPlay];
+    for (TXVodPlayer *videoPlayer in _videoPlayers) {
+        [videoPlayer pause];
     }
 }
 
 - (void)seekChorusVideosToTime:(CGFloat)time
 {
-    for (TXVideoEditer *videoPlayer in _videoPlayers) {
-        [videoPlayer previewAtTime:time];
+    NSLog(@"seekChorusVideosToTime:(%f)", time);
+    for (TXVodPlayer *videoPlayer in _videoPlayers) {
+        [videoPlayer seek:time];
+        [videoPlayer pause];
     }
 }
 

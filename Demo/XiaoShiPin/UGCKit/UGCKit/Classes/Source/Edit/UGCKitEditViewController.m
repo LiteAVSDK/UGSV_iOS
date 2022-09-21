@@ -387,7 +387,11 @@ typedef NS_ENUM(NSInteger,EffectSelectType)
     _pasterAddView.hidden = YES;
     [self.view addSubview:_pasterAddView];
     
-    _musicView = [[UGCKitVideoRecordMusicView alloc] initWithFrame:CGRectMake(0, self.view.ugckit_bottom - 268 * kScaleY, self.view.ugckit_width, 268 * kScaleY) needEffect:NO theme:_theme];
+    _musicView = [[UGCKitVideoRecordMusicView alloc]
+                  initWithFrame:CGRectMake(0, self.view.ugckit_bottom - 268 * kScaleY, self.view.ugckit_width, 268 * kScaleY)
+                  needEffect:NO
+                  needVoiceSetting:YES
+                  theme:_theme];
     _musicView.delegate = self;
     _musicView.hidden = YES;
     [self.view addSubview:_musicView];

@@ -160,7 +160,7 @@ typedef NS_ENUM(NSInteger,DragDirection){
     if (_videoPause && _currentPlayer) {
         //这里如果是从录制界面，或则其他播放界面过来的，要重新startPlay，因为AudioSession有可能被修改了，导致当前视频播放有异常
         NSMutableDictionary *param = [self getPlayerParam:_currentPlayer];
-        [_currentPlayer startPlay:param[@"playUrl"]];
+        [_currentPlayer startVodPlay:param[@"playUrl"]];
         [_currentCell.logicView.playBtn setImage:[UIImage imageNamed:@"pause"] forState:UIControlStateNormal];
         [[UIApplication sharedApplication] setIdleTimerDisabled:YES];
         _videoPause = NO;
@@ -434,7 +434,7 @@ typedef NS_ENUM(NSInteger,DragDirection){
         //经过审核的视频才启动播放
         if ([playerParam[PLAY_REVIEW] intValue] == ReviewStatus_Normal) {
             [playerParam setObject:@(YES) forKey:PLAY_CLICK];
-            int result = [voidPlayer startPlay:playUrl];
+            int result = [voidPlayer startVodPlay:playUrl];
             if( result != 0)
             {
                 [self toastTip:[NSString stringWithFormat:@"%@%d", kErrorMsgRtmpPlayFailed, result]];

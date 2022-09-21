@@ -26,17 +26,17 @@
     UGCKitTheme *_theme;
 }
 
--(instancetype)initWithFrame:(CGRect)frame needEffect:(BOOL)needEffect theme:(UGCKitTheme *)theme
+-(instancetype)initWithFrame:(CGRect)frame needEffect:(BOOL)needEffect needVoiceSetting:(BOOL)needVoiceSetting theme:(UGCKitTheme *)theme
 {
     self = [super initWithFrame:frame];
     if (self) {
         _theme = theme;
-        [self initUI:needEffect];
+        [self initUI:needEffect needVoiceSetting:needVoiceSetting];
     }
     return self;
 }
 
--(void)initUI:(BOOL)needEffect{
+-(void)initUI:(BOOL)needEffect needVoiceSetting:(BOOL)needVoiceSetting{
     self.backgroundColor = [UIColor clearColor];
 
     //BGM
@@ -49,27 +49,35 @@
     [btnStopBGM setImage:_theme.recordMusicDeleteIcon forState:UIControlStateNormal];
     [btnStopBGM addTarget:self action:@selector(onBtnMusicStoped) forControlEvents:UIControlEventTouchUpInside];
     btnStopBGM.autoresizingMask = UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleBottomMargin;
-
-    UILabel *labVolumeForVoice = [[UILabel alloc] initWithFrame:CGRectMake(15, btnSelectBGM.ugckit_bottom + 10, 80, 16)];
-    [labVolumeForVoice setText:L(@"UGCKit.AudioEffect.VolumeRecord")];
-    [labVolumeForVoice setFont:[UIFont systemFontOfSize:14.f]];
-    labVolumeForVoice.textColor = UIColorFromRGB(0xFFFFFF);
-    [labVolumeForVoice sizeToFit];
-    _sldVolumeForVoice = [[UISlider alloc] initWithFrame:CGRectMake(labVolumeForVoice.ugckit_left, labVolumeForVoice.ugckit_bottom + 10,self.ugckit_width - 30, 20)];
-    _sldVolumeForVoice.minimumValue = 0;
-    _sldVolumeForVoice.maximumValue = 1;
-    _sldVolumeForVoice.value = 0.5;
-    _sldVolumeForVoice.autoresizingMask = UIViewAutoresizingFlexibleWidth;
-    [_sldVolumeForVoice setThumbImage:_theme.sliderThumbImage forState:UIControlStateNormal];
-    [_sldVolumeForVoice setMinimumTrackTintColor:_theme.sliderMinColor]; //  RGB(238, 100, 85)];
-    [_sldVolumeForVoice addTarget:self action:@selector(onVoiceValueChange:) forControlEvents:UIControlEventValueChanged];
     
-    UILabel *labVolumeForBGM = [[UILabel alloc] initWithFrame:CGRectMake(labVolumeForVoice.ugckit_left, _sldVolumeForVoice.ugckit_bottom + 20 , 80 , 16)];
+    UILabel *labVolumeForVoice;
+    int volumeForVoiceBottom = btnSelectBGM.ugckit_bottom + 10;
+    if(needVoiceSetting){
+        labVolumeForVoice = [[UILabel alloc] initWithFrame:CGRectMake(15, btnSelectBGM.ugckit_bottom + 10, 80, 16)];
+        [labVolumeForVoice setText:L(@"UGCKit.AudioEffect.VolumeRecord")];
+        [labVolumeForVoice setFont:[UIFont systemFontOfSize:14.f]];
+        labVolumeForVoice.textColor = UIColorFromRGB(0xFFFFFF);
+        [labVolumeForVoice sizeToFit];
+        _sldVolumeForVoice = [[UISlider alloc] initWithFrame:
+                              CGRectMake(labVolumeForVoice.ugckit_left, labVolumeForVoice.ugckit_bottom + 10, self.ugckit_width - 30, 20)];
+        _sldVolumeForVoice.minimumValue = 0;
+        _sldVolumeForVoice.maximumValue = 1;
+        _sldVolumeForVoice.value = 0.5;
+        _sldVolumeForVoice.autoresizingMask = UIViewAutoresizingFlexibleWidth;
+        [_sldVolumeForVoice setThumbImage:_theme.sliderThumbImage forState:UIControlStateNormal];
+        [_sldVolumeForVoice setMinimumTrackTintColor:_theme.sliderMinColor]; //  RGB(238, 100, 85)];
+        [_sldVolumeForVoice addTarget:self action:@selector(onVoiceValueChange:) forControlEvents:UIControlEventValueChanged];
+        
+        volumeForVoiceBottom = _sldVolumeForVoice.ugckit_bottom + 20;
+    }
+    
+    UILabel *labVolumeForBGM = [[UILabel alloc] initWithFrame:CGRectMake(15, volumeForVoiceBottom, 80, 16)];
     [labVolumeForBGM setText:L(@"UGCKit.AudioEffect.VolumeBGM")];
     [labVolumeForBGM sizeToFit];
     [labVolumeForBGM setFont:[UIFont systemFontOfSize:14.f]];
     labVolumeForBGM.textColor = UIColorFromRGB(0xFFFFFF);
-    _sldVolumeForBGM = [[UISlider alloc] initWithFrame:CGRectMake(labVolumeForVoice.ugckit_left, labVolumeForBGM.ugckit_bottom + 10,self.ugckit_width - 30, 20)];
+    _sldVolumeForBGM = [[UISlider alloc] initWithFrame:
+                        CGRectMake(labVolumeForBGM.ugckit_left, labVolumeForBGM.ugckit_bottom + 10,self.ugckit_width - 30, 20)];
     _sldVolumeForBGM.minimumValue = 0;
     _sldVolumeForBGM.maximumValue = 1;
     _sldVolumeForBGM.value = 0.5;
@@ -87,8 +95,10 @@
     [self addSubview:btnStopBGM];
     [self addSubview:labVolumeForBGM];
     [self addSubview:_sldVolumeForBGM];
-    [self addSubview:labVolumeForVoice];
-    [self addSubview:_sldVolumeForVoice];
+    if(needVoiceSetting){
+        [self addSubview:labVolumeForVoice];
+        [self addSubview:_sldVolumeForVoice];
+    }
     [self addSubview:_startTimeLabel];
     [self freshCutView:150];
 }
@@ -172,7 +182,7 @@
 -(void)resetVolume
 {
     _sldVolumeForBGM.value = 1;
-    _sldVolumeForVoice.value = 1;
+//    _sldVolumeForVoice.value = 1;
 }
 
 -(void)resetSiderView

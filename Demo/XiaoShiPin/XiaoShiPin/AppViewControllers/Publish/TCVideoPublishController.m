@@ -367,7 +367,7 @@
     
     _playEnable = YES;
     if (_isPublished == NO) {
-        [_livePlayer startPlay:_recordResult.videoPath type:PLAY_TYPE_LOCAL_VIDEO];
+        [_livePlayer startLivePlay:_recordResult.videoPath type:PLAY_TYPE_LOCAL_VIDEO];
     }
 }
 
@@ -599,7 +599,7 @@
     
     if (_isPublished == NO) {
 
-        [_livePlayer startPlay:_recordResult.videoPath type:PLAY_TYPE_LOCAL_VIDEO];
+        [_livePlayer startLivePlay:_recordResult.videoPath type:PLAY_TYPE_LOCAL_VIDEO];
     }
 }
 
@@ -626,7 +626,7 @@
     dispatch_async(dispatch_get_main_queue(), ^{
         if (EvtID == PLAY_EVT_PLAY_END && _playEnable) {
             [_livePlayer stopPlay];
-            [_livePlayer startPlay:_recordResult.videoPath type:PLAY_TYPE_LOCAL_VIDEO];
+            [_livePlayer startLivePlay:_recordResult.videoPath type:PLAY_TYPE_LOCAL_VIDEO];
             return;
         }
     });

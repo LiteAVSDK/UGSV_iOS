@@ -37,7 +37,7 @@
     }
 #endif
 //    [Bugly startWithAppId:@"6efe67cbad" config:config];
-
+    [TXLiveBase setLicenceURL:@"" key:@""];
     [TXUGCBase setLicenceURL:@"" key:@""];
     [TELicenseCheck setTELicense:@"" key:@"" completion:^(NSInteger authresult, NSString * _Nonnull errorMsg) {
                if (authresult == TELicenseCheckOk) {

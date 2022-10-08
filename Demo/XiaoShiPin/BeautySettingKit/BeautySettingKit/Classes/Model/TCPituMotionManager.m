@@ -26,40 +26,11 @@
         [self setupBundle];
         NSArray *initList = @[
             @[ @"video_boom", @"http://dldir1.qq.com/hudongzhibo/AISpecial/ios/160/video_boom.zip", L(@"Boom") ],
-            // - Remove From Demo
-            @[ @"video_nihongshu", @"http://dldir1.qq.com/hudongzhibo/AISpecial/ios/160/video_nihongshu.zip", L(@"TC.BeautySettingPanel.Rainbow Mouse") ],
-            @[ @"video_fengkuangdacall", @"http://dldir1.qq.com/hudongzhibo/AISpecial/ios/160/video_fengkuangdacall.zip", L(@"TC.BeautySettingPanel.Glow stick") ],
-            @[ @"video_Qxingzuo_iOS", @"http://dldir1.qq.com/hudongzhibo/AISpecial/ios/160/video_Qxingzuo_iOS.zip", L(@"TC.BeautySettingPanel.Q constellation") ],
-            @[ @"video_caidai_iOS", @"http://dldir1.qq.com/hudongzhibo/AISpecial/ios/160/video_caidai_iOS.zip", L(@"TC.BeautySettingPanel.Color Ribbon") ],
-            @[ @"video_liuhaifadai", @"http://dldir1.qq.com/hudongzhibo/AISpecial/ios/160/video_liuhaifadai.zip", L(@"TC.BeautySettingPanel.Bang Ribbon") ],
-            @[ @"video_purplecat", @"http://dldir1.qq.com/hudongzhibo/AISpecial/ios/160/video_purplecat.zip", L(@"TC.BeautySettingPanel.Violet Cat") ],
-            @[ @"video_huaxianzi", @"http://dldir1.qq.com/hudongzhibo/AISpecial/ios/160/video_huaxianzi.zip", L(@"TC.BeautySettingPanel.Floral Fairy") ],
-            @[ @"video_baby_agetest", @"http://dldir1.qq.com/hudongzhibo/AISpecial/ios/160/video_baby_agetest.zip", L(@"TC.BeautySettingPanel.Little princess") ],
-            // 星耳，变脸
-            @[ @"video_3DFace_dogglasses2", @"http://dldir1.qq.com/hudongzhibo/AISpecial/ios/160/video_3DFace_dogglasses2.zip", L(@"TC.BeautySettingPanel.glasses dog") ],
-            @[ @"video_rainbow", @"http://dldir1.qq.com/hudongzhibo/AISpecial/ios/160/video_rainbow.zip", L(@"TC.BeautySettingPanel.rainbow cloud") ],
-            // - /Remove From Demo
         ];
         NSArray *gestureMotionArray = @[
             @[ @"video_pikachu", @"http://dldir1.qq.com/hudongzhibo/AISpecial/Android/181/video_pikachu.zip", L(@"TC.BeautySettingPanel.PikaQiu") ],
-            // - Remove From Demo
-            @[ @"video_liuxingyu", @"https://liteav.sdk.qcloud.com/app/res/pitu//video_liuxingyu.zip", L(@"TC.BeautySettingPanel.Meteor Shower") ],
-            @[ @"video_kongxue2", @"https://liteav.sdk.qcloud.com/app/res/pitu//video_kongxue2.zip", L(@"TC.BeautySettingPanel.Snow Control") ],
-            @[ @"video_dianshizhixing", @"https://liteav.sdk.qcloud.com/app/res/pitu//video_dianshizhixing.zip", L(@"TC.BeautySettingPanel.TV Star") ],
-            @[ @"video_bottle1", @"https://liteav.sdk.qcloud.com/app/res/pitu//video_bottle1.zip", L(@"TC.BeautySettingPanel.Bottle") ],
-            // - /Remove From Demo
         ];
         NSArray *cosmeticMotionArray = @[
-            // - Remove From Demo
-            @[ @"video_cherries", @"https://liteav.sdk.qcloud.com/app/res/pitu//video_cherries.zip", L(@"TC.BeautySettingPanel.Cherries") ],
-            @[ @"video_haiyang2", @"https://liteav.sdk.qcloud.com/app/res/pitu//video_haiyang2.zip", L(@"TC.BeautySettingPanel.Ocean") ],
-            @[ @"video_fenfenxia_square_iOS", @"https://liteav.sdk.qcloud.com/app/res/pitu//video_fenfenxia_square_iOS.zip", L(@"TC.BeautySettingPanel.FenFenXia") ],
-            @[ @"video_guajiezhuang", @"https://liteav.sdk.qcloud.com/app/res/pitu/video_guajiezhuang.zip", L(@"TC.BeautySettingPanel.Widow Makeup") ],
-            @[ @"video_qixichun", @"https://liteav.sdk.qcloud.com/app/res/pitu//video_qixichun.zip", L(@"TC.BeautySettingPanel.Qixichun") ],
-            @[ @"video_gufengzhuang", @"https://liteav.sdk.qcloud.com/app/res/pitu//video_gufengzhuang.zip", L(@"TC.BeautySettingPanel.Gufeng") ],
-            @[ @"video_dxxiaochounv", @"https://liteav.sdk.qcloud.com/app/res/pitu//video_dxxiaochounv.zip", L(@"TC.BeautySettingPanel.Ugly Girl") ],
-            @[ @"video_remix1", @"https://liteav.sdk.qcloud.com/app/res/pitu//video_remix1.zip", L(@"TC.BeautySettingPanel.Mixed Makeup") ],
-            // - /Remove From Demo
             @[ @"video_qingchunzannan_iOS", @"http://res.tu.qq.com/materials/video_qingchunzannan_iOS.zip", L(@"TC.BeautySettingPanel.Fu Gu") ],
         ];
         NSArray *backgroundRemovalArray = @[

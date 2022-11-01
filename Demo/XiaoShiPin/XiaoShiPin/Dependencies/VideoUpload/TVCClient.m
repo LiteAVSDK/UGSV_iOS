@@ -20,6 +20,8 @@
 #include <netdb.h>
 #include <sys/socket.h>
 #include <sys/types.h>
+#import "QuicClient.h"
+#import "QCloudQuicConfig.h"
 //#import "TXRTMPAPI.h"
 
 #define TVCMultipartResumeSessionKey        @"TVCMultipartResumeSessionKey"         // 点播vodSessionKey
@@ -37,6 +39,8 @@
 @property (nonatomic, strong) QCloudAuthentationV5Creator *creator;
 @property (nonatomic, strong) NSString *reqKey;
 @property(nonatomic, strong) NSString* uploadKey;
+@property(nonatomic, strong) NSString* saveVodSessionKey;
+@property(nonatomic, strong) TVCUploadContext *savaUploadContext;
 @property (nonatomic, strong) NSString *serverIP;
 @property (nonatomic, strong) QCloudCOSXMLUploadObjectRequest *uploadRequest;
 @property (nonatomic, strong) TVCReportInfo *reportInfo;
@@ -339,6 +343,8 @@
 
 // 去点播申请上传：获取 COS 上传信息
 - (void)applyUploadUGC:(TVCUploadContext *)uploadContext withVodSessionKey:(NSString *)vodSessionKey {
+    self.saveVodSessionKey = vodSessionKey;
+    self.savaUploadContext = uploadContext;
     if (self.timer == nil) {
         NSMutableDictionary *dict = [[NSMutableDictionary alloc] init];
         [dict setObject:uploadContext forKey:@"uploadContext"];
@@ -674,6 +680,22 @@
     _creator = [[QCloudAuthentationV5Creator alloc] initWithCredential:credential];
 
     QCloudServiceConfiguration *configuration = [QCloudServiceConfiguration new];
+    
+    /**
+    判断上传的region和竞速出来的region是否一致，用来打开quic的开关
+    */
+    if([uploadContext.cugResult.uploadRegion isEqualToString:[QuicClient shareQuicClient].region] && [QuicClient shareQuicClient].isQuic){
+        NSLog(@"---->使用quic");
+        configuration.enableQuic = true;
+        [QCloudQuicConfig shareConfig].race_type = QCloudRaceTypeOnlyQUIC;
+        [QCloudQuicConfig shareConfig].is_custom = NO;
+        [QCloudQuicConfig shareConfig].port = 443;
+    }else{
+        NSLog(@"---->使用http");
+        configuration.enableQuic = false;
+        [QCloudQuicConfig shareConfig].port = 80;
+        [QCloudQuicConfig shareConfig].race_type = QCloudRaceTypeOnlyHTTP;
+    }
 
     configuration.appID = uploadContext.cugResult.uploadAppid;
     configuration.signatureProvider = self;
@@ -730,38 +752,41 @@
     if (uploadContext.isUploadVideo) {
         dispatch_group_async(group, queue, ^{
             QCloudCOSXMLUploadObjectRequest *videoUpload;
-
-            if (uploadContext.resumeData != nil && uploadContext.resumeData.length != 0) {
-                videoUpload = [QCloudCOSXMLUploadObjectRequest requestWithRequestData:uploadContext.resumeData];
-            } else {
-                videoUpload = [QCloudCOSXMLUploadObjectRequest new];
+            
+            videoUpload = (uploadContext.resumeData != nil &&
+                           uploadContext.resumeData.length != 0) ?
+            [QCloudCOSXMLUploadObjectRequest requestWithRequestData:
+             uploadContext.resumeData] : [QCloudCOSXMLUploadObjectRequest new];
+            
+//            if (uploadContext.resumeData != nil && uploadContext.resumeData.length != 0)
+//                videoUpload = [QCloudCOSXMLUploadObjectRequest requestWithRequestData:uploadContext.resumeData];
+//            else {
+//                videoUpload = [QCloudCOSXMLUploadObjectRequest new];
                 videoUpload.body = [NSURL fileURLWithPath:param.videoPath];
                 videoUpload.bucket = cug.uploadBucket;
                 videoUpload.object = cug.videoPath;
 
                 [videoUpload setRequstsMetricArrayBlock:^(NSMutableArray *requstMetricArray) {
-                    if ([requstMetricArray count] > 0 && [requstMetricArray[0] isKindOfClass:[NSDictionary class]]) {
-                        if ([[requstMetricArray[0] allValues] count] > 0) {
-                            NSDictionary *dic = [requstMetricArray[0] allValues][0];
-                            tcpConenctionTimeCost = ([dic[@"kDnsLookupTookTime"] doubleValue] + [dic[@"kConnectTookTime"] doubleValue] +
-                                                        [dic[@"kSignRequestTookTime"] doubleValue])
-                                                    * 1000;
-                            recvRspTimeCost = ([dic[@"kTaskTookTime"] doubleValue] + [dic[@"kReadResponseHeaderTookTime"] doubleValue] +
-                                                  [dic[@"kReadResponseBodyTookTime"] doubleValue])
-                                              * 1000;
-                        }
-                    }
+                    if ([requstMetricArray count] > 0 &&
+                        [requstMetricArray[0] isKindOfClass:[NSDictionary class]] &&
+                        [[requstMetricArray[0] allValues] count] > 0) {
+                        NSDictionary *dic = [requstMetricArray[0] allValues][0];
+                        tcpConenctionTimeCost = ([dic[@"kDnsLookupTookTime"] doubleValue] + [dic[@"kConnectTookTime"] doubleValue] +
+                                                    [dic[@"kSignRequestTookTime"] doubleValue])
+                                                * 1000;
+                        recvRspTimeCost = ([dic[@"kTaskTookTime"] doubleValue] + [dic[@"kReadResponseHeaderTookTime"] doubleValue] +
+                                              [dic[@"kReadResponseBodyTookTime"] doubleValue])
+                                          * 1000;                    }
                 }];
 
                 [videoUpload setInitMultipleUploadFinishBlock:^(
                     QCloudInitiateMultipartUploadResult *multipleUploadInitResult, QCloudCOSXMLUploadObjectResumeData resumeData) {
-                    if (multipleUploadInitResult != nil && resumeData != nil) {
+                    if (multipleUploadInitResult != nil && resumeData != nil)
                         [self setSession:cug.uploadSession resumeData:resumeData lastModTime:uploadContext.videoLastModTime
                             coverLastModTime:uploadContext.coverLastModTime
                                 withFilePath:param.videoPath];
-                    }
                 }];
-            }
+//            }
 
             [videoUpload setFinishBlock:^(QCloudUploadObjectResult *result, NSError *error) {
                 NSLog(@"uploadCosVideo finish : cosBucket:%@ ,cos videoPath:%@, path:%@, size:%lld", cug.uploadBucket, cug.videoPath, param.videoPath,
@@ -770,11 +795,17 @@
                 NSString *requestId = [result.__originHTTPURLResponse__.allHeaderFields objectForKey:@"x-cos-request-id"];
 
                 if (error) {
-                    NSString *errInfo = error.description;
-                    NSString *cosErrorCode = @"";
-                    if (error.userInfo != nil) {
-                        errInfo = error.userInfo.description;
+                    /**
+                    quic上传失败，使用http上传
+                     */
+                    if ([QuicClient shareQuicClient].isQuic) {
+                        [QuicClient shareQuicClient].isQuic = NO;
+                        [self applyUploadUGC:self.savaUploadContext withVodSessionKey:self.saveVodSessionKey];
+                        return;
                     }
+                    NSString *errInfo = error.userInfo == nil ?
+                    error.description : error.userInfo.description;
+                    NSString *cosErrorCode = @"";
                     cosErrorCode = [NSString stringWithFormat:@"%d", error.code];
 
                     // 取消的情况不清除session缓存，错误码定义见 https://cloud.tencent.com/document/product/436/30443
@@ -801,9 +832,10 @@
                         uploadContext.lastStatus = TVC_ERR_VIDEO_UPLOAD_FAILED;
                         uploadContext.desc = [NSString stringWithFormat:@"upload video, cos code:%d, cos desc:%@", error.code, error.description];
                         //网络断开，不清除session缓存
-                        if (error.code != -1009) {
-                            [ws setSession:nil resumeData:nil lastModTime:0 withFilePath:param.videoPath];
-                        }
+                        [ws netError:error.code videoPath:param.videoPath];
+//                        if (error.code != -1009) {
+//                            [ws setSession:nil resumeData:nil lastModTime:0 withFilePath:param.videoPath];
+//                        }
 
                         [ws txReport:TVC_UPLOAD_EVENT_ID_COS errCode:TVC_ERR_VIDEO_UPLOAD_FAILED vodErrCode:0 cosErrCode:cosErrorCode errInfo:errInfo
                                         reqTime:uploadContext.reqTime
@@ -822,9 +854,7 @@
                             cosRecvRespTimeCost:recvRspTimeCost];
                     }
                     dispatch_semaphore_signal(semaphore);
-                    if (uploadContext.isUploadCover) {
-                        dispatch_semaphore_signal(semaphore);
-                    }
+                    if (uploadContext.isUploadCover) dispatch_semaphore_signal(semaphore);
                 } else {
                     NSLog(@"upload video succ");
                     //视频上传完成，上报视频上传信息，清除session缓存
@@ -856,16 +886,16 @@
                         __block uint64_t recvRspTimeCost = 0;
 
                         [coverUpload setRequstsMetricArrayBlock:^(NSMutableArray *requstMetricArray) {
-                            if ([requstMetricArray count] > 0 && [requstMetricArray[0] isKindOfClass:[NSDictionary class]]) {
-                                if ([[requstMetricArray[0] allValues] count] > 0) {
-                                    NSDictionary *dic = [requstMetricArray[0] allValues][0];
-                                    tcpConenctionTimeCost = ([dic[@"kDnsLookupTookTime"] doubleValue] + [dic[@"kConnectTookTime"] doubleValue] +
-                                                                [dic[@"kSignRequestTookTime"] doubleValue])
-                                                            * 1000;
-                                    recvRspTimeCost = ([dic[@"kTaskTookTime"] doubleValue] + [dic[@"kReadResponseHeaderTookTime"] doubleValue] +
-                                                          [dic[@"kReadResponseBodyTookTime"] doubleValue])
-                                                      * 1000;
-                                }
+                            if ([requstMetricArray count] > 0 &&
+                                [requstMetricArray[0] isKindOfClass:[NSDictionary class]] &&
+                                [[requstMetricArray[0] allValues] count] > 0) {
+                                NSDictionary *dic = [requstMetricArray[0] allValues][0];
+                                tcpConenctionTimeCost = ([dic[@"kDnsLookupTookTime"] doubleValue] + [dic[@"kConnectTookTime"] doubleValue] +
+                                                            [dic[@"kSignRequestTookTime"] doubleValue])
+                                                        * 1000;
+                                recvRspTimeCost = ([dic[@"kTaskTookTime"] doubleValue] + [dic[@"kReadResponseHeaderTookTime"] doubleValue] +
+                                                      [dic[@"kReadResponseBodyTookTime"] doubleValue])
+                                                  * 1000;
                             }
                         }];
 
@@ -876,22 +906,21 @@
                             if (error) {
                                 // 2-2步骤出错
                                 NSLog(@"upload cover fail : %d", error.code);
-                                NSString *errInfo = error.description;
-                                if (error.userInfo != nil) {
-                                    errInfo = error.userInfo.description;
-                                }
+                                NSString *errInfo = error.userInfo == nil ?
+                                error.description : error.userInfo.description;
                                 cosErrorCode = [NSString stringWithFormat:@"%d", error.code];
+                                
+                                [self setContext:uploadContext error:error cosErrorCode:cosErrorCode errInfo:errInfo];
 
-                                if (error.code == 30000) {
-                                    uploadContext.lastStatus = TVC_ERR_USER_CANCLE;
-                                    uploadContext.desc = [NSString stringWithFormat:@"upload cover, user cancled"];
-                                } else {
-                                    uploadContext.lastStatus = TVC_ERR_COVER_UPLOAD_FAILED;
-                                    uploadContext.desc = [NSString stringWithFormat:@"upload cover, cos code:%@, cos desc:%@", cosErrorCode, errInfo];
-                                }
-                            } else {
+//                                if (error.code == 30000) {
+//                                    uploadContext.lastStatus = TVC_ERR_USER_CANCLE;
+//                                    uploadContext.desc = [NSString stringWithFormat:@"upload cover, user cancled"];
+//                                } else {
+//                                    uploadContext.lastStatus = TVC_ERR_COVER_UPLOAD_FAILED;
+//                                    uploadContext.desc = [NSString stringWithFormat:@"upload cover, cos code:%@, cos desc:%@", cosErrorCode, errInfo];
+//                                }
+                            } else
                                 NSLog(@"upload cover succ");
-                            }
                             reqTimeCost = [[NSDate date] timeIntervalSince1970] * 1000 - uploadContext.reqTime;
                             [ws txReport:TVC_UPLOAD_EVENT_ID_COS errCode:uploadContext.lastStatus vodErrCode:0 cosErrCode:cosErrorCode
                                             errInfo:uploadContext.desc
@@ -911,55 +940,88 @@
                                 cosRecvRespTimeCost:recvRspTimeCost];
                             dispatch_semaphore_signal(semaphore);
                         }];
+                        
+                        [self setCoverUploadProgress:uploadContext coverUpload:coverUpload ws:ws];
 
-                        TVCProgressBlock progress = uploadContext.progressBlock;
-                        [coverUpload setSendProcessBlock:^(int64_t bytesSent, int64_t totalBytesSent, int64_t totalBytesExpectedToSend) {
-                            if (progress) {
-                                uint64_t total = uploadContext.videoSize + uploadContext.coverSize;
-                                uploadContext.currentUpload += bytesSent;
-                                if (uploadContext.currentUpload > total) {
-                                    uploadContext.currentUpload = total;
-                                    ws.virtualPercent = 100 - VIRTUAL_TOTAL_PERCENT;
-                                    [ws.timer setFireDate:[NSDate date]];  //上传完成，启动结束虚拟进度
-                                } else {
-                                    progress(
-                                        uploadContext.currentUpload * (100 - 2 * VIRTUAL_TOTAL_PERCENT) / 100 + VIRTUAL_TOTAL_PERCENT * total / 100,
-                                        total);
-                                }
-                            }
-                        }];
                         ws.uploadRequest = coverUpload;
                         [[QCloudCOSTransferMangerService costransfermangerServiceForKey:self.uploadKey] UploadObject:coverUpload];
                     }
                 }
                 dispatch_semaphore_signal(semaphore);
             }];
-
-            TVCProgressBlock progress = uploadContext.progressBlock;
-            [videoUpload setSendProcessBlock:^(int64_t bytesSent, int64_t totalBytesSent, int64_t totalBytesExpectedToSend) {
-                if (!ws.realProgressFired) {
-                    [ws.timer setFireDate:[NSDate distantFuture]];
-                    ws.realProgressFired = YES;
-                }
-
-                if (progress) {
-                    uint64_t total = uploadContext.videoSize + uploadContext.coverSize;
-                    uploadContext.currentUpload = totalBytesSent;
-                    if (uploadContext.currentUpload > total) {
-                        uploadContext.currentUpload = total;
-                        ws.virtualPercent = 100 - VIRTUAL_TOTAL_PERCENT;
-                        [ws.timer setFireDate:[NSDate date]];  //上传完成，启动结束虚拟进度
-                    } else {
-                        progress(uploadContext.currentUpload * (100 - 2 * VIRTUAL_TOTAL_PERCENT) / 100 + VIRTUAL_TOTAL_PERCENT * total / 100, total);
-                    }
-                }
-            }];
+            
+            [self setVideoUploadProgress:uploadContext videoUpload:videoUpload ws:ws];
+            
             ws.uploadRequest = videoUpload;
             [[QCloudCOSTransferMangerService costransfermangerServiceForKey:self.uploadKey] UploadObject:videoUpload];
         });
     }
 
     [self notifyCosUploadEnd:uploadContext];
+}
+
+
+//上传进度
+- (void)setVideoUploadProgress:(TVCUploadContext *)uploadContext videoUpload:(QCloudCOSXMLUploadObjectRequest *)videoUpload ws:(TVCClient *)ws{
+    TVCProgressBlock progress = uploadContext.progressBlock;
+    [videoUpload setSendProcessBlock:^(int64_t bytesSent, int64_t totalBytesSent, int64_t totalBytesExpectedToSend) {
+        if (!ws.realProgressFired) {
+            [ws.timer setFireDate:[NSDate distantFuture]];
+            ws.realProgressFired = YES;
+        }
+
+        if (progress) {
+            uint64_t total = uploadContext.videoSize + uploadContext.coverSize;
+            uploadContext.currentUpload = totalBytesSent;
+            if (uploadContext.currentUpload > total) {
+                uploadContext.currentUpload = total;
+                ws.virtualPercent = 100 - VIRTUAL_TOTAL_PERCENT;
+                [ws.timer setFireDate:[NSDate date]];  //上传完成，启动结束虚拟进度
+            } else {
+                progress(uploadContext.currentUpload * (100 - 2 * VIRTUAL_TOTAL_PERCENT) / 100 + VIRTUAL_TOTAL_PERCENT * total / 100, total);
+            }
+        }
+    }];
+}
+
+- (void)setCoverUploadProgress:(TVCUploadContext *)uploadContext coverUpload:(QCloudCOSXMLUploadObjectRequest *)coverUpload ws:(TVCClient *)ws{
+    TVCProgressBlock progress = uploadContext.progressBlock;
+    [coverUpload setSendProcessBlock:^(int64_t bytesSent, int64_t totalBytesSent, int64_t totalBytesExpectedToSend) {
+        if (progress) {
+            uint64_t total = uploadContext.videoSize + uploadContext.coverSize;
+            uploadContext.currentUpload += bytesSent;
+            if (uploadContext.currentUpload > total) {
+                uploadContext.currentUpload = total;
+                ws.virtualPercent = 100 - VIRTUAL_TOTAL_PERCENT;
+                [ws.timer setFireDate:[NSDate date]];  //上传完成，启动结束虚拟进度
+            } else {
+                progress(
+                    uploadContext.currentUpload * (100 - 2 * VIRTUAL_TOTAL_PERCENT) / 100 + VIRTUAL_TOTAL_PERCENT * total / 100,
+                    total);
+            }
+        }
+    }];
+}
+
+//网络断开，不清除session缓存
+-(void)netError:(NSInteger)code
+      videoPath:(NSString *)videoPath{
+    if (code != -1009) {
+        [self setSession:nil resumeData:nil lastModTime:0 withFilePath:videoPath];
+    }
+}
+
+- (void)setContext:(TVCUploadContext *)uploadContext
+                        error:(NSError *)error
+                 cosErrorCode:(NSString *)cosErrorCode
+                      errInfo:(NSString *)errInfo{
+    if (error.code == 30000) {
+        uploadContext.lastStatus = TVC_ERR_USER_CANCLE;
+        uploadContext.desc = [NSString stringWithFormat:@"upload cover, user cancled"];
+    } else {
+        uploadContext.lastStatus = TVC_ERR_COVER_UPLOAD_FAILED;
+        uploadContext.desc = [NSString stringWithFormat:@"upload cover, cos code:%@, cos desc:%@", cosErrorCode, errInfo];
+    }
 }
 
 - (void)notifyCosUploadEnd:(TVCUploadContext *)uploadContext {
@@ -1574,3 +1636,4 @@
 }
 
 @end
+ 

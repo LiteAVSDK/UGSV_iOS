@@ -8,13 +8,14 @@ def tx_UGCKit(subName)
 end
 
 target 'XiaoShiPinApp' do
-  tx_UGCKit 'UGC'
+  tx_UGCKit 'Professional'
   pod 'BeautySettingKit', :path => 'BeautySettingKit/BeautySettingKit.podspec'
   pod 'xmagickit', :path => 'xmagickit/xmagickit.podspec'
   pod "AFNetworking"
   pod "MJRefresh"
   pod "MBProgressHUD"
   pod "SDWebImage"
+  pod 'QCloudQuic/Slim','6.0.5'
 end
 
 

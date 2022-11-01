@@ -7,12 +7,15 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "QuicClient.h"
 
 typedef void (^TXUGCPrepareUploadCompletion)();
 
 @interface TXUGCCosRegionInfo : NSObject
 @property(nonatomic, copy) NSString *region;
 @property(nonatomic, copy) NSString *domain;
+//是否支持quic
+@property(nonatomic, assign) BOOL isQuic;
 @end
 
 @interface TXUGCPublishOptCenter : NSObject
@@ -24,6 +27,7 @@ typedef void (^TXUGCPrepareUploadCompletion)();
 @property(strong, nonatomic) NSMutableDictionary *publishingList;
 @property(strong, nonatomic) TXUGCCosRegionInfo *cosRegionInfo;
 @property(nonatomic, assign) UInt64 minCosRespTime;
+@property(nonatomic, strong) QuicClient *quicClient; //quicClient
 
 - (void)prepareUpload:(NSString *)signature
     prepareUploadComplete:(TXUGCPrepareUploadCompletion)prepareUploadComplete;

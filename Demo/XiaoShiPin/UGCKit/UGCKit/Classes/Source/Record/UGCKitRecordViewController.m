@@ -174,6 +174,7 @@ YTSDKLogListener,TXVideoCustomProcessDelegate,TXVideoCustomProcessListener
 @property(nonatomic, strong) XMagic *xMagicKit;  //xmagic对象
 //提示信息
 @property(nonatomic, strong) UILabel *tipsLabel;  //提示信息
+@property(nonatomic, strong) NSLock  *lock;
 @end
 
 
@@ -207,6 +208,7 @@ YTSDKLogListener,TXVideoCustomProcessDelegate,TXVideoCustomProcessListener
 }
 //处理纹理，接入第三方美颜
 - (GLuint)onPreProcessTexture:(GLuint)texture width:(CGFloat)width height:(CGFloat)height{
+    [_lock lock];
     if(!_xMagicKit) {
         [self buildBeautySDK:(int)width and:(int)height texture:texture];
         self.lastRenderWidth = width;
@@ -233,6 +235,7 @@ YTSDKLogListener,TXVideoCustomProcessDelegate,TXVideoCustomProcessListener
 
    YTProcessOutput *output =[self.xMagicKit process:input withOrigin:YtLightImageOriginTopLeft withOrientation:YtLightCameraRotation0];
 
+   [_lock unlock];
    if(cloudContext != xmagicContext){
        [EAGLContext setCurrentContext: cloudContext];
    }
@@ -372,6 +375,7 @@ YTSDKLogListener,TXVideoCustomProcessDelegate,TXVideoCustomProcessListener
 {
     [super viewDidLoad];
     _initData = FALSE;
+    _lock = [[NSLock alloc] init];
     self.xMagicKit = nil;
     self.lastRenderWidth = 0;
     self.lastRenderHeight = 0;
@@ -1938,13 +1942,19 @@ YTSDKLogListener,TXVideoCustomProcessDelegate,TXVideoCustomProcessListener
 
 - (void)dealloc
 {
+    [self removeXMagic];
     [self uinit];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
+}
+
+- (void)removeXMagic{
     if (self.xMagicKit) {
+        [_lock lock];
         [self.xMagicKit clearListeners];
         [self.xMagicKit deinit];
         self.xMagicKit = nil;
         _initData = FALSE;
+        [_lock unlock];
     }
 }
 @end

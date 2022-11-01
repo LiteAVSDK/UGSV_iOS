@@ -13,6 +13,7 @@
 #import "TVCClientInner.h"
 #import "TVCCommon.h"
 #import "TVCReport.h"
+#import "QuicClient.h"
 
 #define HTTPDNS_SERVER @"https://119.29.29.99/d?dn="  // httpdns服务器
 #define HTTPDNS_TOKEN @"800654663"
@@ -151,12 +152,19 @@ static TXUGCPublishOptCenter *_shareInstance = nil;
                  NSLog(@"httpdns domain[%@] ips[%@]", domain, ips);
 
                  NSArray *ipLists = [ips componentsSeparatedByString:@";"];
-                 [self.cacheMap setValue:ipLists forKey:domain];
+                [self setCacheValue:domain ipLists:ipLists];
 
                  if (completion) {
                      completion(errCode);
                  }
                }];
+}
+
+// 由于NSMutableDictionary不是线程安全的，这里单独起一个加锁方法
+- (void)setCacheValue:(NSString *)domain ipLists:(NSArray *)ipLists {
+    @synchronized (self) {
+        [self.cacheMap setValue:ipLists forKey:domain];
+    }
 }
 
 //监控网络接入变化
@@ -343,6 +351,7 @@ static TXUGCPublishOptCenter *_shareInstance = nil;
                   if (region.length > 0 && domain.length > 0) {
                       [self getCosDNS:domain ips:ips];
                       [self detectBestCosIP:domain region:region];
+                      [self quicTest:domain region:region];
                   }
               }
             }];
@@ -355,6 +364,8 @@ static TXUGCPublishOptCenter *_shareInstance = nil;
         (isRegionEmpty ? @""
                        : [NSString stringWithFormat:@"%@|%@", self.cosRegionInfo.region,
                                                     self.cosRegionInfo.domain]);
+    [QuicClient shareQuicClient].region = self.cosRegionInfo.region;
+    [QuicClient shareQuicClient].isQuic = self.cosRegionInfo.isQuic;
     [self reportPublishOptResult:TVC_UPLOAD_EVENT_ID_DETECT_DOMAIN_RESULT
                          errCode:(isRegionEmpty ? 1 : 0)errMsg:errMsg
                          reqTime:reqTime
@@ -379,14 +390,10 @@ static TXUGCPublishOptCenter *_shareInstance = nil;
                      if (errCode == 0) {
                          UInt64 endTs = (UInt64)([[NSDate date] timeIntervalSince1970] * 1000);
                          UInt64 cosTs = (endTs - beginTs);
-                         NSLog(@"detectBestCosIP domain = %@, result = %d, timeCos = %llu", domain, errCode, cosTs);
+                         NSLog(@"detectBestCosIP domain = %@, result = %d, timeCos = %llu",
+                               domain, errCode, cosTs);
                          @synchronized(self->_cosRegionInfo) {
-                             if (self.minCosRespTime == 0 || cosTs < self.minCosRespTime) {
-                                 self.minCosRespTime = cosTs;
-                                 self.cosRegionInfo.region = region;
-                                 self.cosRegionInfo.domain = domain;
-                                 NSLog(@"detectBestCosIP bestCosDomain = %@, bestCosRegion = %@, timeCos = %llu", domain, region, cosTs);
-                             }
+                             [self comparisonTime:cosTs region:region domain:domain isQuic:NO];
                          }
                      }
                  }
@@ -469,6 +476,37 @@ static TXUGCPublishOptCenter *_shareInstance = nil;
     reportInfo.reqTimeCost = reqTimeCost;
 
     [[TVCReport shareInstance] addReportInfo:reportInfo];
+}
+
+-(void)comparisonTime:(UInt64)cosTs
+               region:(NSString *)region
+               domain:(NSString *)domain
+               isQuic:(BOOL)isQuic{
+    if (self.minCosRespTime == 0 || cosTs < self.minCosRespTime) {
+        self.minCosRespTime = cosTs;
+        self.cosRegionInfo.region = region;
+        self.cosRegionInfo.domain = domain;
+        self.cosRegionInfo.isQuic = isQuic;
+        NSLog(@"detectBestCosIP bestCosDomain = %@, bestCosRegion = %@, timeCos = %llu", domain, region, cosTs);
+    }
+}
+
+//quic探测
+-(void)quicTest:(NSString *)domain
+         region:(NSString *)region{
+    NSArray* tmp = [self.cacheMap valueForKey:domain];
+    if (tmp != nil && tmp.count > 0) {
+        NSString* ip = [tmp objectAtIndex:0];
+        _quicClient = [QuicClient new];
+        [_quicClient sendQuicRequest:domain ip:ip region:region
+        completion:^(UInt64 cosTs,NSString* domain,NSString* region,BOOL isQuic){
+            if (isQuic) {
+                @synchronized(self->_cosRegionInfo) {
+                    [self comparisonTime:cosTs region:region domain:domain isQuic:YES];
+                }
+            }
+        }];
+    }
 }
 
 @end

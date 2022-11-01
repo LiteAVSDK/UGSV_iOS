@@ -73,10 +73,8 @@
         UIGraphicsBeginImageContextWithOptions(CGSizeMake(1, 1), YES, 1);
         [_theme.backgroundColor set];
         UIRectFill(CGRectMake(0, 0, 1, 1));
-        [navigationBar setBackgroundImage:UIGraphicsGetImageFromCurrentImageContext() forBarMetrics:UIBarMetricsDefault];
         UIGraphicsEndImageContext();
         navigationBar.barStyle = UIBarStyleBlack;
-        [navigationBar setTranslucent:NO];
         navigationBar.shadowImage = [[UIImage alloc] init];
         [navigationBar setTitleTextAttributes:@{NSForegroundColorAttributeName: _theme.titleColor}];
     }

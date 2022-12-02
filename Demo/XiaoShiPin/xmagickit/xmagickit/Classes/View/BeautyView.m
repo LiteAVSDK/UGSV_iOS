@@ -1052,12 +1052,6 @@ typedef void(^DownloadCallback)(bool download);
 // 取消图片选择回调
 - (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker {
     [self.viewController dismissViewControllerAnimated:YES completion:nil];
-    if (_segPath == nil) {
-        _model.beautySegSelectedIndex = _lastIndexPath;
-        [self.beautyCollection reloadData];
-        [self collectionView:self.beautyCollection didSelectItemAtIndexPath:_lastIndexPath];
-        [self.beautyCollection selectItemAtIndexPath:_lastIndexPath animated:NO scrollPosition:(UICollectionViewScrollPositionNone)];
-    }
     NSLog(@"取消");
 }
 

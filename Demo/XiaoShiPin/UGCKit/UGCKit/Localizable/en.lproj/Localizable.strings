@@ -21,7 +21,13 @@
 "UGCKit.Common.Clear" = "Clear";
 "UGCKit.Common.Choose" = "Choose";
 "UGCKit.Common.openBeautyTitle" = "Personal Information Collection Instructions";
-"UGCKit.Common.openBeautyMsg" = "When you use the beauty function, we will perform real-time intelligent recognition on your facial pixel information captured in real time, and collect your facial pixel information in real time during the beautification process to provide you with better beauty effects. We will not Store or associate your facial pixel information in any form. This information is sensitive personal information, please provide it with caution. If you do not authorize, you will not be able to use this function; you can also disable this function by turning off Beauty at any time.";
+"UGCKit.Common.openBeautyMsg" = "\nWhen you use beauty functions (including basic beauty and advanced beauty), we will perform real-time intelligent recognition on your facial pixel information captured in real time, and collect your facial pixel information in real time during the beauty process to provide you with For better beauty effects, we will not store or associate your facial pixel information in any form. This information is sensitive personal information, please provide it with caution. If you do not authorize, you will not be able to use this function; you can also disable this function by turning off Beauty at any time.";
+"UGCKit.Common.TXBeautyTitle" = "
+Advanced beauty function description";
+"UGCKit.Common.TXBeautyMsg" = "Advanced beautification is provided by Tencent special effects SDK, which requires additional payment. If you do not need advanced beautifying effects, you can use the basic beautifying functions.";
+"UGCKit.Common.TXBeautyName" = "Tencent special effects SDK";
+"UGCKit.Common.TXBeautyNoMore" = "No more reminders";
+"UGCKit.Common.TXBeautySure" = "OK";
 "UGCKit.Common.openBeautyForbidden" = "prohibit";
 "UGCKit.Common.openBeautyAllow" = "always allow";
 "UGCKit.Media.VideoSynthesizing" = "Processing…";
@@ -172,7 +178,8 @@
 "UGCKit.Record.AudioMix" = "Mix";
 "UGCKit.Record.CountDown" = "Count Down";
 "UGCKit.Record.BeautyLabelMusic" = "Music";
-"UGCKit.Record.BeautyLabelBeauty" = "Beauty";
+"UGCKit.Record.BeautyLabelBeauty" = "Basic Beauty";
+"UGCKit.Record.BeautyLabelTXBeauty" = "Advanced Beauty";
 "UGCKit.Record.SpeedSlow0" = "Slower";
 "UGCKit.Record.SpeedSlow" = "Slow";
 "UGCKit.Record.SpeedStandard" = "Normal";

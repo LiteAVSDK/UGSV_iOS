@@ -211,22 +211,32 @@
         }
     }];
     y = CGRectGetMaxY(_btnRatioGroup.frame)+space;
+    
+    // 混音近钮
+    _btnAudioEffect = [self _createButton:[_theme localizedString:@"UGCKit.Record.AudioMix"]
+                                 image:_theme.recordAudioEffectIcon
+                              position:CGPointMake(centerX, y)];
+    [self addSubview:_btnAudioEffect];
+    
+    y = CGRectGetMaxY(_btnAudioEffect.frame) + space;
 
-    // 美颜按钮
+    // 基础美颜按钮
     _btnBeauty = [self _createButton:[_theme localizedString:@"UGCKit.Record.BeautyLabelBeauty"]
                               image:_theme.recordBeautyIcon
                            position:CGPointMake(centerX, y)];
     [self addSubview:_btnBeauty];
 
     y = CGRectGetMaxY(_btnBeauty.frame) + space;
-
-    // 混音近钮
-    _btnAudioEffect = [self _createButton:[_theme localizedString:@"UGCKit.Record.AudioMix"]
-                                 image:_theme.recordAudioEffectIcon
+    
+    // 高级美颜按钮
+    _btnTXBeauty = [self _createButton:[_theme localizedString:@"UGCKit.Record.BeautyLabelTXBeauty"]
+                                 image:_theme.recordTXBeautyIcon
                               position:CGPointMake(centerX, y)];
-    [self addSubview:_btnAudioEffect];
-    y = CGRectGetMaxY(_btnAudioEffect.frame) + space;
-
+    [self addSubview:_btnTXBeauty];
+    
+    y = CGRectGetMaxY(_btnTXBeauty.frame) + space;
+    
+    
     _btnCountDown = [self _createButton:[_theme localizedString:@"UGCKit.Record.CountDown"]
                                   image:_theme.recordCountDownIcon
                                position:CGPointMake(centerX, y)];
@@ -234,7 +244,7 @@
     _btnCountDown.hidden = YES;
     // y = CGRectGetMaxY(_btnCountDown.frame) + space;
 
-    NSArray<UIView *> *rightSideControls = @[_btnMusic, _btnRatioGroup, _btnBeauty,
+    NSArray<UIView *> *rightSideControls = @[_btnMusic, _btnRatioGroup, _btnBeauty,_btnTXBeauty,
                                             _btnCountDown, _btnAudioEffect];
 
     // 底部按钮

@@ -49,7 +49,8 @@ static const CGFloat SubMenuTitleFontSize = 12;
         layout                      = [[UICollectionViewFlowLayout alloc] init];
         layout.scrollDirection      = UICollectionViewScrollDirectionHorizontal;
         const CGFloat subMenuHeight = CGRectGetHeight(frame) - BeautyViewCollectionHeight;
-        CGRect        subMenuFrame  = CGRectMake(0, CGRectGetMinY(_menuCollectionView.frame) - subMenuHeight, CGRectGetWidth(self.bounds), subMenuHeight);
+        CGRect        subMenuFrame  = CGRectMake(0, CGRectGetMinY(_menuCollectionView.frame)
+        - subMenuHeight, CGRectGetWidth(self.bounds), subMenuHeight);
 
         _optionsCollectionView                                = [[UICollectionView alloc] initWithFrame:subMenuFrame collectionViewLayout:layout];
         _optionsCollectionView.autoresizingMask               = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleTopMargin;

@@ -55,6 +55,7 @@ typedef NS_ENUM(NSInteger, TCBeautyStyle) {
  * “自然”风格美颜，值为6；开启“美白”选项，值为1；使用“标准”风格滤镜，值为5；其它均为关闭。
  */
 - (void)resetAndApplyValues;
+- (void)recoverBeautyValues;
 + (NSUInteger)getHeight;
 - (UIImage*)filterImageByMenuOptionIndex:(NSInteger)index;
 - (float)filterMixLevelByIndex:(NSInteger)index;

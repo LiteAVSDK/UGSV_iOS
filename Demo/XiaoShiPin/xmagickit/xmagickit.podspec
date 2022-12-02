@@ -39,7 +39,7 @@ TODO: Add long description of the pod here.
 
    s.public_header_files = 'xmagickit/Classes/**/*.h'
    
-   s.dependency 'XMagic','2.4.2.114'
+   s.dependency 'XMagic','2.5.0.250'
    s.dependency 'Masonry'
    s.dependency 'ZipArchive'
    s.dependency 'SDWebImage'

@@ -1,7 +1,7 @@
 // Copyright (c) 2019 Tencent. All rights reserved.
 #import "UGCKitRecordViewController.h"
 #import <MediaPlayer/MediaPlayer.h>
-//#import <TCBeautyPanel/TCBeautyPanel.h>
+#import <BeautySettingKit/TCBeautyPanel.h>
 #import "SDKHeader.h"
 #import "UGCKitMem.h"
 #import "UGCKitMediaPickerViewController.h"
@@ -28,6 +28,7 @@
 #import <OpenGLES/ES2/gl.h>
 #import <OpenGLES/ES2/glext.h>
 #import <YTCommonXMagic/yt_auth_apple.h>
+#define ScreenWidth                         [[UIScreen mainScreen] bounds].size.width
 static const CGFloat BUTTON_CONTROL_SIZE = 40;
 static const CGFloat AudioEffectViewHeight = 150;
 
@@ -85,7 +86,7 @@ typedef NS_ENUM(NSInteger, RecordState) {
 <TXUGCRecordListener, UIGestureRecognizerDelegate,
 MPMediaPickerControllerDelegate,TCBGMControllerListener,TXVideoJoinerListener,
 UGCKitVideoRecordMusicViewDelegate,UGCKitAudioEffectPanelDelegate,YTSDKEventListener,
-YTSDKLogListener,TXVideoCustomProcessDelegate,TXVideoCustomProcessListener
+YTSDKLogListener,TXVideoCustomProcessDelegate,TXVideoCustomProcessListener,BeautyLoadPituDelegate
 #if POD_PITU
 , MCCameraDynamicDelegate
 #endif
@@ -98,8 +99,13 @@ YTSDKLogListener,TXVideoCustomProcessDelegate,TXVideoCustomProcessListener
     NSString            *_coverPath;   // 保存路径, 视频为<_coverPath>.mp4结尾, 封面图为<_coverPath>.png
 
     BOOL                            _isFrontCamera;
-    BOOL                            _vBeautyShow;
+    BOOL                            _vBeautyShow;      //显示基础美颜
+    BOOL                            _vTXBeautyShow;    //显示高级美颜
+    BOOL                            _openTXBeauty;     //使用高级美颜
     BOOL                            _preloadingVideos;
+    // Chorus
+    TXVideoBeautyStyle              _beautyStyle;
+    float                           _beautyDepth;
     float                           _whitenDepth;
     float                           _ruddinessDepth;
     float                           _eye_level;
@@ -142,7 +148,8 @@ YTSDKLogListener,TXVideoCustomProcessDelegate,TXVideoCustomProcessListener
     UGCKitVideoRecordMusicView *  _musicView;
     SpeedMode                 _speedMode;
     
-    BeautyView *      _vBeauty;
+    TCBeautyPanel *      _vBeauty;      //基础美颜
+    BeautyView *         _vTXBeauty;    //高级美颜
     UGCKitProgressHUD*        _hud;
     CGFloat                   _bgmBeginTime;
     BOOL                      _bgmRecording;
@@ -175,6 +182,9 @@ YTSDKLogListener,TXVideoCustomProcessDelegate,TXVideoCustomProcessListener
 //提示信息
 @property(nonatomic, strong) UILabel *tipsLabel;  //提示信息
 @property(nonatomic, strong) NSLock  *lock;
+@property(nonatomic, strong) UIButton  *btnTips;  //高级美颜提示
+@property(nonatomic, assign) BOOL bgmPlaying;
+@property(nonatomic, assign) BOOL audioMute;
 @end
 
 
@@ -190,6 +200,9 @@ YTSDKLogListener,TXVideoCustomProcessDelegate,TXVideoCustomProcessListener
 
 - (void)viewWillDisappear:(BOOL)animated
 {
+    if (self.xMagicKit != nil) {
+        [self.xMagicKit onPause];
+    }
     [[NSNotificationCenter defaultCenter] removeObserver:self name:UIApplicationWillResignActiveNotification object:nil];
     [[NSNotificationCenter defaultCenter] removeObserver:self name:UIApplicationDidBecomeActiveNotification object:nil];
     [self.navigationController setNavigationBarHidden:_navigationBarHidden animated:NO];
@@ -209,6 +222,10 @@ YTSDKLogListener,TXVideoCustomProcessDelegate,TXVideoCustomProcessListener
 //处理纹理，接入第三方美颜
 - (GLuint)onPreProcessTexture:(GLuint)texture width:(CGFloat)width height:(CGFloat)height{
     [_lock lock];
+    if (!_openTXBeauty) {
+        [_lock unlock];
+        return texture;
+    }
     if(!_xMagicKit) {
         [self buildBeautySDK:(int)width and:(int)height texture:texture];
         self.lastRenderWidth = width;
@@ -218,6 +235,10 @@ YTSDKLogListener,TXVideoCustomProcessDelegate,TXVideoCustomProcessListener
        [_xMagicKit setRenderSize:CGSizeMake(width, height)];
        self.lastRenderWidth = width;
        self.lastRenderHeight = height;
+   }
+   if (self.bgmPlaying && !self.audioMute) {
+       [self.xMagicKit setAudioMute:YES];
+       self.audioMute = YES;
    }
    YTProcessInput *input = [[YTProcessInput alloc] init];
    input.textureData = [[YTTextureData alloc] init];
@@ -296,22 +317,22 @@ YTSDKLogListener,TXVideoCustomProcessDelegate,TXVideoCustomProcessListener
     self.xMagicKit = [[XMagic alloc] initWithRenderSize:CGSizeMake(width,height) assetsDict:assetsDict];
     // Register log
     [self.xMagicKit registerSDKEventListener:self];
-    [self.xMagicKit registerLoggerListener:self withDefaultLevel:YT_SDK_VERBOSE_LEVEL];
+    [self.xMagicKit registerLoggerListener:self withDefaultLevel:YT_SDK_ERROR_LEVEL];
     //去掉磨皮
     [self.xMagicKit configPropertyWithType:@"beauty" withName:@"beauty.smooth" withData:@"0.0" withExtraInfo:nil];
 
-//    _vBeauty.beautyKitRef = self.xMagicKit;
-    [_vBeauty setXMagic:self.xMagicKit];
-    _vBeauty.viewController = self;
+//    _vTXBeauty.beautyKitRef = self.xMagicKit;
+    [_vTXBeauty setXMagic:self.xMagicKit];
+    _vTXBeauty.viewController = self;
     __weak __typeof(self)weakSelf = self;
-    _vBeauty.itemSelectedBlock = ^() {
+    _vTXBeauty.itemSelectedBlock = ^() {
         __strong typeof(self) strongSelf = weakSelf;
         dispatch_async(dispatch_get_main_queue(), ^{
             __strong typeof(self) strongSelf = weakSelf;
             strongSelf.tipsLabel.hidden = YES;
         });
     };
-    [_vBeauty updateAllBeautyValue];
+    [_vTXBeauty updateAllBeautyValue];
 }
 
 - (instancetype)initWithConfig:(UGCKitRecordConfig *)config theme:(UGCKitTheme *)theme
@@ -343,7 +364,10 @@ YTSDKLogListener,TXVideoCustomProcessDelegate,TXVideoCustomProcessListener
     _appForeground = YES;
     _isFrontCamera = YES;
     _vBeautyShow = NO;
+    _vTXBeautyShow = NO;
 
+    _beautyStyle = VIDOE_BEAUTY_STYLE_SMOOTH;
+    _beautyDepth = 6.3;
     _whitenDepth = 2.7;
 
     _isCameraPreviewOn = NO;
@@ -381,6 +405,7 @@ YTSDKLogListener,TXVideoCustomProcessDelegate,TXVideoCustomProcessListener
     self.lastRenderHeight = 0;
     [self initUI];
 //    buildBeautySDK
+    [self initTXBeautyUI];
     [self initBeautyUI];
 
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onAppWillResignActive:) name:UIApplicationWillResignActiveNotification object:nil];
@@ -395,6 +420,9 @@ YTSDKLogListener,TXVideoCustomProcessDelegate,TXVideoCustomProcessListener
 - (void)viewWillAppear:(BOOL)animated{
     [super viewWillAppear:animated];
     
+    if (self.xMagicKit != nil) {
+        [self.xMagicKit onResume];
+    }
     _navigationBarHidden = self.navigationController.navigationBar.hidden;
     [self.navigationController setNavigationBarHidden:YES animated:NO];
     if (_isCameraPreviewOn == NO) {
@@ -411,12 +439,6 @@ YTSDKLogListener,TXVideoCustomProcessDelegate,TXVideoCustomProcessListener
         [[TXUGCRecord shareInstance] setReverbType:_revertType];
     }
 }
-
-//- (void)viewWillDisappear:(BOOL)animated
-//{
-//    [super viewWillDisappear:animated];
-//    [self.navigationController setNavigationBarHidden:_navigationBarHidden animated:NO];
-//}
 
 - (void)viewDidDisappear:(BOOL)animated
 {
@@ -546,6 +568,15 @@ YTSDKLogListener,TXVideoCustomProcessDelegate,TXVideoCustomProcessListener
     [btnBack setImage:_theme.backIcon forState:UIControlStateNormal];
     [btnBack addTarget:self action:@selector(onTapBackButton:) forControlEvents:UIControlEventTouchUpInside];
     [self.view addSubview:btnBack];
+    
+    // 高级美颜提示按钮
+    _btnTips = [UGCKitSmallButton buttonWithType:UIButtonTypeCustom];
+    _btnTips.bounds = CGRectMake(0, 0, BUTTON_CONTROL_SIZE, BUTTON_CONTROL_SIZE);
+    _btnTips.center = CGPointMake(ScreenWidth - 17, centerY);
+    [_btnTips setImage:_theme.tipsIcon forState:UIControlStateNormal];
+    [_btnTips addTarget:self action:@selector(onTapTipsButton:) forControlEvents:UIControlEventTouchUpInside];
+    [self.view addSubview:_btnTips];
+    _btnTips.hidden = YES;
 
     // 比例按钮配置
     _controlView.videoRatio = _config.ratio;
@@ -554,6 +585,7 @@ YTSDKLogListener,TXVideoCustomProcessDelegate,TXVideoCustomProcessListener
     [_controlView.btnMusic addTarget:self action:@selector(onBtnMusicClicked:) forControlEvents:UIControlEventTouchUpInside];
     [_controlView.btnRatioGroup addTarget:self action:@selector(onBtnRatioClicked:) forControlEvents:UIControlEventValueChanged];
     [_controlView.btnBeauty addTarget:self action:@selector(onBtnBeautyClicked:) forControlEvents:UIControlEventTouchUpInside];
+    [_controlView.btnTXBeauty addTarget:self action:@selector(onBtnTXBeautyClicked:) forControlEvents:UIControlEventTouchUpInside];
     [_controlView.btnAudioEffect addTarget:self action:@selector(onBtnAudioMix:) forControlEvents:UIControlEventTouchUpInside];
 
     [_controlView.btnStartRecord addTarget:self action:@selector(onRecordButtonTouchDown:) forControlEvents:UIControlEventTouchDown];
@@ -571,6 +603,10 @@ YTSDKLogListener,TXVideoCustomProcessDelegate,TXVideoCustomProcessListener
     UIPinchGestureRecognizer* pinchGensture = [[UIPinchGestureRecognizer alloc] initWithTarget:self action:@selector(onPInchZoom:)];
     [self.view addGestureRecognizer:pinchGensture];
 
+    // 滑动滤镜
+    UIPanGestureRecognizer* panGensture = [[UIPanGestureRecognizer alloc] initWithTarget:self action: @selector (onPanSlideFilter:)];
+    panGensture.delegate = self;
+    [self.view addGestureRecognizer:panGensture];
     if (UGCKitRecordStyleDuet == _config.recordStyle) { // 分屏合拍
         videoContainer.frame = CGRectMake(0, CGRectGetMaxY(_btnNext.frame) + 20,
                                           CGRectGetWidth(self.view.bounds),
@@ -595,6 +631,11 @@ YTSDKLogListener,TXVideoCustomProcessDelegate,TXVideoCustomProcessListener
     CGRect countDownFrame = _controlView.btnCountDown.frame;
     countDownFrame.origin.y = CGRectGetMinY(_controlView.btnRatioGroup.frame);
     _controlView.btnCountDown.frame = countDownFrame;
+    countDownFrame.origin.y = CGRectGetMaxY(countDownFrame)+20;
+    _controlView.btnBeauty.frame = countDownFrame;
+    countDownFrame.origin.y = CGRectGetMaxY(countDownFrame)+20;
+    _controlView.btnTXBeauty.frame = countDownFrame;
+    
     _controlView.countDownModeEnabled = YES;
 
     _btnChangeVideo.hidden = NO;
@@ -655,7 +696,7 @@ YTSDKLogListener,TXVideoCustomProcessDelegate,TXVideoCustomProcessListener
 }
 
 #pragma mark ---- Video Beauty UI ----
--(void)initBeautyUI
+-(void)initTXBeautyUI
 {
     UIEdgeInsets gSafeInset;
 #if __IPHONE_11_0 && __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_11_0
@@ -671,9 +712,9 @@ YTSDKLogListener,TXVideoCustomProcessDelegate,TXVideoCustomProcessListener
 
     dispatch_async(dispatch_get_main_queue(), ^{
         //美颜选项界面
-        _vBeauty = [[BeautyView alloc] init];
-        [self.view addSubview:_vBeauty];
-        [_vBeauty mas_makeConstraints:^(MASConstraintMaker *make) {
+        _vTXBeauty = [[BeautyView alloc] init];
+        [self.view addSubview:_vTXBeauty];
+        [_vTXBeauty mas_makeConstraints:^(MASConstraintMaker *make) {
             make.width.mas_equalTo(self.view);
             make.centerX.mas_equalTo(self.view);
             make.height.mas_equalTo(254);
@@ -683,8 +724,26 @@ YTSDKLogListener,TXVideoCustomProcessDelegate,TXVideoCustomProcessListener
                 make.bottom.mas_equalTo(self.view.mas_bottom).mas_offset(-10);
             }
         }];
-        _vBeauty.hidden = YES;
+        _vTXBeauty.hidden = YES;
     });
+}
+
+-(void)initBeautyUI{
+    NSUInteger controlHeight = [ TCBeautyPanel getHeight];
+    CGFloat offset = 0;
+    if (@available(iOS 11, *)) {
+        offset = [UIApplication sharedApplication].keyWindow.safeAreaInsets.bottom;
+    }
+    _vBeauty = [[ TCBeautyPanel alloc] initWithFrame:CGRectMake(0,
+    self.view.frame.size.height - controlHeight - offset,
+    self.view.frame.size.width, controlHeight)
+    theme:_theme
+    actionPerformer:[TCBeautyPanelActionProxy proxyWithSDKObject:[TXUGCRecord shareInstance]]];
+    _vBeauty.hidden = YES;
+    _vBeauty.pituDelegate = self;
+    _vBeauty.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleTopMargin;
+    [self.view addSubview:_vBeauty];
+    _vBeauty.hidden = YES;
 }
 
 - (void)setSelectedSpeed:(SpeedMode)tag
@@ -722,6 +781,11 @@ YTSDKLogListener,TXVideoCustomProcessDelegate,TXVideoCustomProcessListener
         __strong __typeof(wself) strongSelf = wself;
         [strongSelf _goBack];
     }];
+}
+
+-(IBAction)onTapTipsButton:(id)sender
+{
+    [self openTXBeautyDialog:NO];
 }
 
 - (void)_goBack {
@@ -824,11 +888,15 @@ YTSDKLogListener,TXVideoCustomProcessDelegate,TXVideoCustomProcessListener
 
 - (IBAction)onBtnMusicClicked:(id)sender
 {
-    _vBeauty.hidden = YES;
+    _vTXBeauty.hidden = YES;
     UIView *musicView = [self musicView];
     if (_BGMPath) {
         musicView.hidden = !musicView.hidden;
         [self hideBottomView:!musicView.hidden];
+        [self playBGM:0 toTime:MAXFLOAT recordSpeed:VIDEO_RECORD_SPEED_NOMAL];
+        if (self.xMagicKit != nil) {
+            [self.xMagicKit setAudioMute:YES];
+        }
     }else{
         UINavigationController *nv = [[UINavigationController alloc] initWithRootViewController:_bgmListVC];
         [nv.navigationBar setTitleTextAttributes:@{NSForegroundColorAttributeName:_theme.titleColor}];
@@ -886,7 +954,7 @@ YTSDKLogListener,TXVideoCustomProcessDelegate,TXVideoCustomProcessListener
     [self hideBottomView:YES];
     UGCKitAudioEffectPanel *soundMixView = [self soundMixView];
     soundMixView.hidden = NO;
-    _vBeauty.hidden = YES;
+    _vTXBeauty.hidden = YES;
     _musicView.hidden = YES;
 
     CATransition *animation = [CATransition animation];
@@ -902,20 +970,55 @@ YTSDKLogListener,TXVideoCustomProcessDelegate,TXVideoCustomProcessListener
 -(IBAction)onBtnBeautyClicked:(id)sender
 {
     if(!_vBeautyShow && ![[NSUserDefaults standardUserDefaults] boolForKey:@"beauty"]){
-        [self openDialog];
+        [self openDialog:YES];
     }else{
         [self showBeauty];
+        [_vBeauty recoverBeautyValues];
+    }
+}
+
+-(IBAction)onBtnTXBeautyClicked:(id)sender
+{
+    if(!_vTXBeautyShow && ![[NSUserDefaults standardUserDefaults] boolForKey:@"beauty"]){
+        [self openDialog:NO];
+    }else{
+        if(!_vTXBeautyShow && ![[NSUserDefaults standardUserDefaults] boolForKey:@"txbeauty_nomore"]){
+            [self openTXBeautyDialog:YES];
+        }else{
+            [self showTXBeauty];
+        }
     }
 }
 
 -(void)showBeauty{
+    [_lock lock];
     _vBeautyShow = !_vBeautyShow;
     _musicView.hidden = YES;
     _vBeauty.hidden = !_vBeautyShow;
     [self hideBottomView:_vBeautyShow];
+    if (_vBeautyShow) {
+        _openTXBeauty = NO;
+        [_xMagicKit setAudioMute:YES];
+    }
+    [_lock unlock];
 }
 
--(void)openDialog{
+-(void)showTXBeauty{
+    [_lock lock];
+    _vTXBeautyShow = !_vTXBeautyShow;
+    _musicView.hidden = YES;
+    _vTXBeauty.hidden = !_vTXBeautyShow;
+    [self hideBottomView:_vTXBeautyShow];
+    _btnTips.hidden = !_vTXBeautyShow;
+    if (_vTXBeautyShow) {
+        [self resetBeautySettings];
+        _openTXBeauty = YES;
+        [_xMagicKit setAudioMute:NO];
+    }
+    [_lock unlock];
+}
+
+-(void)openDialog:(BOOL)showBeauty{
     // 初始化UIAlertController
     UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"" message:@"" preferredStyle:UIAlertControllerStyleAlert];
 
@@ -939,8 +1042,18 @@ YTSDKLogListener,TXVideoCustomProcessDelegate,TXVideoCustomProcessListener
     UIAlertAction *sureAction = [UIAlertAction actionWithTitle:
     [_theme localizedString:@"UGCKit.Common.openBeautyAllow"]
     style:UIAlertActionStyleDestructive handler:^(UIAlertAction * _Nonnull action) {
-        [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"beauty"];
-        [self showBeauty];
+        if (showBeauty) {
+            [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"beauty"];
+            [self showBeauty];
+
+        }else{
+            [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"beauty"];
+            if(!_vTXBeautyShow && ![[NSUserDefaults standardUserDefaults] boolForKey:@"txbeauty_nomore"]){
+                [self openTXBeautyDialog:YES];
+            }else{
+                [self showTXBeauty];
+            }
+        }
     }];
     // KVC修改字体颜色
     [sureAction setValue:[UIColor colorWithRed:241/255.0 green:66/255.0 blue:87/255.0 alpha:1/1.0] forKey:@"_titleTextColor"];
@@ -952,7 +1065,86 @@ YTSDKLogListener,TXVideoCustomProcessDelegate,TXVideoCustomProcessListener
     }];
     [cancelAction setValue:[UIColor blackColor] forKey:@"_titleTextColor"];
     [alertController addAction:cancelAction];
+
     [self presentViewController:alertController animated:YES completion:nil];
+}
+
+-(void)openTXBeautyDialog:(BOOL)showAction{
+    // 初始化UIAlertController
+    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"" message:@"" preferredStyle:UIAlertControllerStyleAlert];
+
+    //修改title字体及颜色
+    NSMutableAttributedString *titleStr = [[NSMutableAttributedString alloc] initWithString:[_theme localizedString:@"UGCKit.Common.TXBeautyTitle"]];
+    [titleStr addAttribute:NSForegroundColorAttributeName
+    value:[UIColor colorWithRed:0/255.0 green:0/255.0 blue:0/255.0 alpha:0.9/1.0]
+    range:NSMakeRange(0, titleStr.length)];
+    
+    [titleStr addAttribute:NSFontAttributeName value:[UIFont systemFontOfSize:20] range:NSMakeRange(0, titleStr.length)];
+    [alertController setValue:titleStr forKey:@"attributedTitle"];
+
+    // 修改message字体及颜色
+    NSMutableAttributedString *messageStr = [[NSMutableAttributedString alloc] initWithString:[_theme localizedString:@"UGCKit.Common.TXBeautyMsg"]];
+    [messageStr addAttribute:NSForegroundColorAttributeName
+    value:[UIColor colorWithRed:0/255.0 green:0/255.0 blue:0/255.0 alpha:0.3/1.0]
+    range:NSMakeRange(0, messageStr.length)];
+    [messageStr addAttribute:NSForegroundColorAttributeName
+    value:[UIColor colorWithRed:0/255.0 green:0/255.0 blue:255/255.0 alpha:1.0/1.0]
+    range:[[messageStr string] rangeOfString:[_theme localizedString:@"UGCKit.Common.TXBeautyName"]]];
+    [messageStr addAttribute:NSLinkAttributeName value:@"https://cloud.tencent.com/product/x-magic" range:[[messageStr string] rangeOfString:[_theme localizedString:@"UGCKit.Common.TXBeautyName"]]];
+    [messageStr addAttribute:NSFontAttributeName value:[UIFont systemFontOfSize:18] range:NSMakeRange(0, messageStr.length)];
+//    [alertController setValue:messageStr forKey:@"attributedMessage"];
+    
+    UIViewController *viewController = [[UIViewController alloc]init];
+    UITextView *textView = [[UITextView alloc]initWithFrame:CGRectMake(10, -10, 250,120)];
+    textView.attributedText =messageStr;
+    textView.editable = NO;
+
+    textView.scrollEnabled = YES;
+    textView.backgroundColor = [UIColor clearColor];
+
+    [viewController.view addSubview:textView];
+
+    [alertController setValue:viewController forKey:@"contentViewController"];
+    
+
+    // 添加UIAlertAction
+    UIAlertAction *sureAction = [UIAlertAction actionWithTitle:
+    [_theme localizedString:@"UGCKit.Common.TXBeautySure"]
+    style:UIAlertActionStyleDestructive handler:^(UIAlertAction * _Nonnull action) {
+        if (showAction) {
+            [self showTXBeauty];
+        }
+    }];
+    // KVC修改字体颜色
+    [sureAction setValue:[UIColor colorWithRed:241/255.0 green:66/255.0 blue:87/255.0 alpha:1/1.0] forKey:@"_titleTextColor"];
+    [alertController addAction:sureAction];
+    if (showAction) {
+        UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:
+        [_theme localizedString:@"UGCKit.Common.TXBeautyNoMore"]
+        style:UIAlertActionStyleCancel handler:^(UIAlertAction * _Nonnull action){
+            [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"txbeauty_nomore"];
+            [self showTXBeauty];
+            NSLog(@"取消");
+        }];
+        [cancelAction setValue:[UIColor blackColor] forKey:@"_titleTextColor"];
+        [alertController addAction:cancelAction];
+    }
+    [self presentViewController:alertController animated:YES completion:nil];
+}
+
+/**
+ 判断当前语言是否是简体中文
+ */
+- (BOOL)isCurrentLanguageHans
+{
+    NSArray *languages = [NSLocale preferredLanguages];
+    NSString *currentLanguage = [languages objectAtIndex:0];
+    if ([currentLanguage isEqualToString:@"zh-Hans-CN"])
+    {
+        return YES;
+    }
+    
+    return NO;
 }
 
 -(IBAction)onTapCameraSwitch
@@ -1185,6 +1377,10 @@ YTSDKLogListener,TXVideoCustomProcessDelegate,TXVideoCustomProcessListener
 }
 
 - (void)startRecord {
+    if (_BGMPath != nil) {
+        self.bgmPlaying = YES;
+        self.audioMute = NO;
+    }
     if (_recordTime >= _config.maxDuration) {
         // 如果到达长度了，继续录制，那进入结束状态
         [self _finishRecord];
@@ -1209,7 +1405,6 @@ YTSDKLogListener,TXVideoCustomProcessDelegate,TXVideoCustomProcessListener
         _bgmRecording = YES;
     }
     [[TXUGCRecord shareInstance] resumeRecord];
-
     [self _configButtonToPause];
 
     if (_deleteCount == 1) {
@@ -1378,7 +1573,13 @@ YTSDKLogListener,TXVideoCustomProcessDelegate,TXVideoCustomProcessListener
         }
         
         if (!self->_isFromMusicSelectVC) {
-
+            TXBeautyManager *beautyManager = [[TXUGCRecord shareInstance] getBeautyManager];
+            [beautyManager setBeautyStyle:(TXBeautyStyle)_beautyStyle];
+            [beautyManager setBeautyLevel:_beautyDepth];
+            [beautyManager setWhitenessLevel:_whitenDepth];
+            [beautyManager setRuddyLevel:_ruddinessDepth];
+            [beautyManager setEyeScaleLevel:_eye_level];
+            [beautyManager setFaceSlimLevel:_face_level];
         }
         
 #if POD_PITU
@@ -1430,6 +1631,7 @@ YTSDKLogListener,TXVideoCustomProcessDelegate,TXVideoCustomProcessListener
 }
 
 - (void)resetBeautySettings {
+    [_vBeauty resetAndApplyValues];
     [[[TXUGCRecord shareInstance] getBeautyManager] setFilter:nil];
     [[[TXUGCRecord shareInstance] getBeautyManager] setGreenScreenFile:nil];
 }
@@ -1555,14 +1757,18 @@ YTSDKLogListener,TXVideoCustomProcessDelegate,TXVideoCustomProcessListener
 #pragma mark Control Panel Switching
 - (void)touchesEnded:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event
 {
-    if (_vBeautyShow)
+    if (_vBeautyShow || _vTXBeautyShow)
     {
         _isCameraPreviewOn = YES;
         UITouch *touch = [[event allTouches] anyObject];
         CGPoint _touchPoint = [touch locationInView:self.view];
-        if (NO == CGRectContainsPoint(_vBeauty.frame, _touchPoint))
+        if (NO == CGRectContainsPoint(_vBeauty.frame, _touchPoint) && _vBeautyShow)
         {
-            [self onBtnBeautyClicked:nil];
+            [self showBeauty];
+        }
+        if (NO == CGRectContainsPoint(_vTXBeauty.frame, _touchPoint) && _vTXBeautyShow)
+        {
+            [self showTXBeauty];
         }
     }
     if (_musicView && !_musicView.hidden) {
@@ -1571,6 +1777,10 @@ YTSDKLogListener,TXVideoCustomProcessDelegate,TXVideoCustomProcessListener
             _musicView.hidden = YES;
             // 隐藏面板的时候，停止播放音乐，否者录制时候开始会有一点点杂音
             [[TXUGCRecord shareInstance] stopBGM];
+            self.bgmPlaying = NO;
+            if (self.xMagicKit != nil) {
+                [self.xMagicKit setAudioMute:NO];
+            }
             [self hideBottomView:NO];
         }
     }
@@ -1732,6 +1942,9 @@ YTSDKLogListener,TXVideoCustomProcessDelegate,TXVideoCustomProcessListener
     }
     [self onSetBGM:path];
     _isScrollToStart = YES;
+    if (self.xMagicKit != nil) {
+        [self.xMagicKit setAudioMute:YES];
+    }
     [self playBGM:0 toTime:MAXFLOAT recordSpeed:VIDEO_RECORD_SPEED_NOMAL];
     dispatch_async(dispatch_get_main_queue(), ^(){
         self->_musicView.hidden = NO;
@@ -1770,10 +1983,14 @@ YTSDKLogListener,TXVideoCustomProcessDelegate,TXVideoCustomProcessListener
 
 -(void)onBtnMusicStoped
 {
+    if (self.xMagicKit != nil) {
+        [self.xMagicKit setAudioMute:NO];
+    }
     _BGMPath = nil;
     _bgmRecording = NO;
     [_bgmListVC clearSelectStatus];
     [[TXUGCRecord shareInstance] stopBGM];
+    self.bgmPlaying = NO;
     _musicView.hidden = YES;
     [self hideBottomView:NO];
 }
@@ -1819,6 +2036,9 @@ YTSDKLogListener,TXVideoCustomProcessDelegate,TXVideoCustomProcessListener
 
 -(void)playBGM:(CGFloat)beginTime toTime:(CGFloat)endTime recordSpeed:(TXVideoRecordSpeed)speed
 {
+    if (_BGMPath != nil) {
+        self.bgmPlaying = YES;
+    }
     if (_BGMPath != nil) {
         
         if (endTime == MAXFLOAT) {
@@ -1887,7 +2107,89 @@ YTSDKLogListener,TXVideoCustomProcessDelegate,TXVideoCustomProcessListener
 
 - (void)onPanSlideFilter:(UIPanGestureRecognizer*)recognizer
 {
+    if (_vBeautyShow) {
+        CGPoint translation = [recognizer translationInView:self.view.superview];
+        [recognizer velocityInView:self.view];
+        CGPoint speed = [recognizer velocityInView:self.view];
+        
+    //    NSLog(@"pan center:(%.2f)", translation.x);
+    //    NSLog(@"pan speed:(%.2f)", speed.x);
+        
+        float ratio = translation.x / self.view.frame.size.width;
+        float leftRatio = ratio;
+        NSInteger index = [_vBeauty currentFilterIndex];
+        UIImage* curFilterImage = [_vBeauty filterImageByMenuOptionIndex:index];
+        UIImage* filterImage1 = nil;
+        UIImage* filterImage2 = nil;
+        CGFloat filter1Level = 0.f;
+        CGFloat filter2Level = 0.f;
+        if (leftRatio > 0) {
+            filterImage1 = [_vBeauty filterImageByMenuOptionIndex:index - 1];
+            filter1Level = [_vBeauty filterMixLevelByIndex:index - 1] / 10;
+            filterImage2 = curFilterImage;
+            filter2Level = [_vBeauty filterMixLevelByIndex:index] / 10;
+        }
+        else {
+            filterImage1 = curFilterImage;
+            filter1Level = [_vBeauty filterMixLevelByIndex:index] / 10;
+            filterImage2 = [_vBeauty filterImageByMenuOptionIndex:index + 1];
+            filter2Level = [_vBeauty filterMixLevelByIndex:index + 1] / 10;
+            leftRatio = 1 + leftRatio;
+        }
+        
+        if (recognizer.state == UIGestureRecognizerStateChanged) {
+            [[TXUGCRecord shareInstance] setFilter:filterImage1
+            leftIntensity:filter1Level rightFilter:filterImage2
+            rightIntensity:filter2Level leftRatio:leftRatio];
+        }
+        else if (recognizer.state == UIGestureRecognizerStateEnded) {
+            BOOL isDependRadio = fabs(speed.x) < 500; //x方向的速度
+            [self animateFromFilter1:filterImage1 filter2:filterImage2
+            filter1MixLevel:filter1Level filter2MixLevel:filter2Level
+            leftRadio:leftRatio speed:speed.x completion:^{
+                NSInteger filterIndex = 0;
+                if (!isDependRadio) {
+                    if (speed.x < 0) {
+                        filterIndex = index + 1;
+                    } else {
+                        filterIndex = index - 1;
+                    }
+                } else {
+                    if (ratio > 0.5) {   //过半或者速度>500就切换
+                        filterIndex = index - 1;
+                    } else if  (ratio < -0.5) {
+                        filterIndex = index + 1;
+                    }
+                }
+                self->_vBeauty.currentFilterIndex = filterIndex;
+                UILabel* filterTipLabel = [UILabel new];
+                filterTipLabel.text = [self->_vBeauty currentFilterName];
+                filterTipLabel.font = [UIFont systemFontOfSize:30];
+                filterTipLabel.textColor = UIColor.whiteColor;
+                filterTipLabel.alpha = 0.1;
+                [filterTipLabel sizeToFit];
+                CGSize viewSize = self.view.frame.size;
+                CGFloat centerX = UGCKitRecordStyleDuet != self->_config.recordStyle ? viewSize.width / 2 : viewSize.width / 4;
+                CGFloat centerY = UGCKitRecordStyleTrio != self->_config.recordStyle ? viewSize.height / 3 : viewSize.height / 2;
+                filterTipLabel.center = CGPointMake(centerX, centerY);
+                [self.view addSubview:filterTipLabel];
 
+                [UIView animateWithDuration:0.25 animations:^{
+                    filterTipLabel.alpha = 1;
+                } completion:^(BOOL finished) {
+                    [UIView animateWithDuration:0.25 delay:0.25 options:UIViewAnimationOptionCurveLinear animations:^{
+                        filterTipLabel.alpha = 0.1;
+                    } completion:^(BOOL finished) {
+                        [filterTipLabel removeFromSuperview];
+                    }];
+                }];
+            }];
+            
+            
+        }
+
+    }
+    
 }
 
 - (void)animateFromFilter1:(UIImage*)filter1Image filter2:(UIImage*)filter2Image filter1MixLevel:(CGFloat)filter1MixLevel filter2MixLevel:(CGFloat)filter2MixLevel leftRadio:(CGFloat)leftRadio speed:(CGFloat)speed completion:(void(^)(void))completion
@@ -2108,6 +2410,16 @@ YTSDKLogListener,TXVideoCustomProcessDelegate,TXVideoCustomProcessListener
 - (instancetype)init
 {
     return nil;
+}
+
+- (void)dealloc
+{
+    if (_videoPlayers) {
+        for (TXVodPlayer *videoPlayer in _videoPlayers) {
+            [videoPlayer stopPlay];
+            [videoPlayer removeVideoWidget];
+        }
+    }
 }
 
 - (NSArray<NSNumber *> *)allVideoVolumes

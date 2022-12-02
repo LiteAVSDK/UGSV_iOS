@@ -40,6 +40,7 @@ typedef NS_ENUM(NSInteger, UGCKitRecordButtonStyle) {
 @property (strong, nonatomic) UGCKitSlideButton *btnRatioGroup;
 @property (strong, nonatomic) UGCKitTheme *theme;
 @property (strong, nonatomic) UIButton *btnBeauty;
+@property (strong, nonatomic) UIButton *btnTXBeauty;
 @property (strong, nonatomic) UIButton *btnMusic;
 @property (strong, nonatomic) UIButton *btnAudioEffect;
 @property (strong, nonatomic) UIButton *btnCountDown;

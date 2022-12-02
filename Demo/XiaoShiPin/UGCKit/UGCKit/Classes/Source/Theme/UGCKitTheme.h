@@ -12,6 +12,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong) UIColor *titleColor;
 /// 后退按钮
 @property (strong, nonatomic) UIImage *backIcon;
+/// 高级美颜提示按钮
+@property (strong, nonatomic) UIImage *tipsIcon;
 /// 圆角按钮背景图
 @property (strong, nonatomic) UIImage *nextIcon;
 /// 背景色
@@ -159,8 +161,10 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) UIImage *recordAspect169Icon;
 /// 录制-9:16屏比图标
 @property (strong, nonatomic) UIImage *recordAspect916Icon;
-/// 录制-美颜图标
+/// 录制-基础美颜图标
 @property (strong, nonatomic) UIImage *recordBeautyIcon;
+/// 录制-高级美颜图标
+@property (strong, nonatomic) UIImage *recordTXBeautyIcon;
 /// 录制-音效图标
 @property (strong, nonatomic) UIImage *recordAudioEffectIcon;
 /// 录制-倒计时图标

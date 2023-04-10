@@ -54,9 +54,12 @@ TCFilterIdentifier const TCFilterIdentifierRixi      = @"rixi";
         NSFileManager *manager = [[NSFileManager alloc] init];
         if ([manager fileExistsAtPath:path]) {
             NSArray<TCFilterIdentifier> *availableFilters = @[
-                TCFilterIdentifierBaiXi, TCFilterIdentifierNormal, TCFilterIdentifierZiRan, TCFilterIdentifierYinghong, TCFilterIdentifierYunshang, TCFilterIdentifierChunzhen,
-                TCFilterIdentifierBailan, TCFilterIdentifierYuanqi, TCFilterIdentifierChaotuo, TCFilterIdentifierXiangfen, TCFilterIdentifierWhite, TCFilterIdentifierLangman,
-                TCFilterIdentifierQingxin, TCFilterIdentifierWeimei, TCFilterIdentifierFennen, TCFilterIdentifierHuaijiu, TCFilterIdentifierLandiao, TCFilterIdentifierQingliang, TCFilterIdentifierRixi
+                TCFilterIdentifierNormal,  TCFilterIdentifierYinghong, TCFilterIdentifierYunshang,
+                TCFilterIdentifierChunzhen,TCFilterIdentifierBailan, TCFilterIdentifierYuanqi,
+                TCFilterIdentifierChaotuo, TCFilterIdentifierXiangfen,  TCFilterIdentifierLangman,
+                TCFilterIdentifierQingxin, TCFilterIdentifierWeimei, TCFilterIdentifierFennen,
+                TCFilterIdentifierHuaijiu, TCFilterIdentifierLandiao, TCFilterIdentifierQingliang,
+                TCFilterIdentifierRixi
             ];
             NSMutableArray<TCFilter *> *                         filters   = [[NSMutableArray alloc] initWithCapacity:availableFilters.count];
             NSMutableDictionary<TCFilterIdentifier, TCFilter *> *filterMap = [[NSMutableDictionary alloc] initWithCapacity:availableFilters.count];

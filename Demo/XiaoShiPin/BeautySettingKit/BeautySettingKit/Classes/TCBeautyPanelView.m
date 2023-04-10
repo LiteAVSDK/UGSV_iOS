@@ -185,7 +185,7 @@ static TCBeautyPanelItem *makeMenuItem(NSString *title, UIImage *icon, id target
     // 默认值配置
     const BeautyMenuItem defaultBeautyStyle          = BeautyMenuItemPiTu;
     self.beautyStyle                                 = BeautyMenuItemPiTu;
-    const TCFilterIdentifier defaultFilterIdentifier = TCFilterIdentifierBaiXi;
+    const TCFilterIdentifier defaultFilterIdentifier = TCFilterIdentifierNormal;
     // index = 0 为关闭
     NSUInteger defaultFilterIndex = [_filters indexOfObjectPassingTest:^BOOL(TCFilter *_Nonnull obj, NSUInteger idx, BOOL *_Nonnull stop) {
         return [obj.identifier isEqualToString:defaultFilterIdentifier];
@@ -193,9 +193,7 @@ static TCBeautyPanelItem *makeMenuItem(NSString *title, UIImage *icon, id target
     // 滤镜
     NSDictionary *defaultFilterValue = @{
         TCFilterIdentifierNone : @(0),
-        TCFilterIdentifierBaiXi : @(5),
         TCFilterIdentifierNormal : @(5),
-        TCFilterIdentifierZiRan : @(5),
         TCFilterIdentifierYinghong : @(8),
         TCFilterIdentifierYunshang : @(8),
         TCFilterIdentifierChunzhen : @(7),
@@ -203,7 +201,6 @@ static TCBeautyPanelItem *makeMenuItem(NSString *title, UIImage *icon, id target
         TCFilterIdentifierYuanqi : @(8),
         TCFilterIdentifierChaotuo : @(10),
         TCFilterIdentifierXiangfen : @(5),
-        TCFilterIdentifierWhite : @(3),
         TCFilterIdentifierLangman : @(3),
         TCFilterIdentifierQingxin : @(3),
         TCFilterIdentifierWeimei : @(3),

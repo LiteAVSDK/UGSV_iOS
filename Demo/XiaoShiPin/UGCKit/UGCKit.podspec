@@ -27,7 +27,7 @@ TODO: Add long description of the pod here.
   s.author           = { 'originleeli@tencent.com' => 'originleeli@tencent.com' }
   s.source           = { :git => 'https://github.com/originleeli@tencent.com/UGCKit.git', :tag => s.version.to_s }
   # s.social_media_url = 'https://twitter.com/<TWITTER_USERNAME>'
-  s.ios.deployment_target = '9.0'
+  s.ios.deployment_target = '11.0'
   s.static_framework = true
   s.default_subspec = 'Professional'
   s.ios.framework    = ['SystemConfiguration','CoreTelephony', 'VideoToolbox', 'CoreGraphics', 'AVFoundation', 'Accelerate','AssetsLibrary']

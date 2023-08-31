@@ -14,6 +14,7 @@
 #import "MBProgressHUD.h"
 #import "TCUserInfoModel.h"
 #import "TCWebViewController.h"
+#import "CommonUtil.h"
 
 #define L(X) NSLocalizedString((X), nil)
 
@@ -129,7 +130,7 @@
     
     NSString *content = NSLocalizedString(@"TCLogin.agreement", nil);
     UITextView *contentTextView = [[UITextView alloc] initWithFrame:CGRectMake(40, 230, [[UIScreen mainScreen] bounds].size.width - 40, 60)];
-    if ([self isCurrentLanguageHans]) {
+    if ([CommonUtil isCurrentLanguageHans]) {
         contentTextView.attributedText = [self getContentLabelAttributedText:content range1:NSMakeRange(7, 6) range1:NSMakeRange(content.length - 6, 6) fontSize:14];
     }else{
         contentTextView.attributedText = [self getContentLabelAttributedText:content range1:NSMakeRange(29, 14) range1:NSMakeRange(content.length - 14, 14) fontSize:14];
@@ -327,21 +328,6 @@
     dispatch_async(dispatch_get_main_queue(), ^{
         [self.navigationController popViewControllerAnimated:YES];
     });
-}
-
-/**
- 判断当前语言是否是简体中文
- */
-- (BOOL)isCurrentLanguageHans
-{
-    NSArray *languages = [NSLocale preferredLanguages];
-    NSString *currentLanguage = [languages objectAtIndex:0];
-    if ([currentLanguage isEqualToString:@"zh-Hans-CN"])
-    {
-        return YES;
-    }
-    
-    return NO;
 }
 
 #pragma mark - UITextFieldDelegate

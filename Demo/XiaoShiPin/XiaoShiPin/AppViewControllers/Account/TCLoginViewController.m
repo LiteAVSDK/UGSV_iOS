@@ -20,6 +20,7 @@
 #import "AppDelegate.h"
 #import "SettingViewController.h"
 #import "DeleteAccountViewController.h"
+#import "CommonUtil.h"
 
 @interface TCLoginViewController ()<UITextFieldDelegate, TCLoginListener, UIGestureRecognizerDelegate>
 {
@@ -183,7 +184,7 @@
     
     NSString *content = NSLocalizedString(@"TCLogin.agreement", nil);
     UITextView *contentTextView = [[UITextView alloc] initWithFrame:CGRectMake(40, 190, [[UIScreen mainScreen] bounds].size.width - 40, 60)];
-    if ([self isCurrentLanguageHans]) {
+    if ([CommonUtil isCurrentLanguageHans]) {
         contentTextView.attributedText = [self getContentLabelAttributedText:content range1:NSMakeRange(7, 6) range2:NSMakeRange(content.length - 6, 6) fontSize:14];
     }else{
         contentTextView.attributedText = [self getContentLabelAttributedText:content range1:NSMakeRange(29, 14) range2:NSMakeRange(content.length - 14, 14) fontSize:14];
@@ -276,7 +277,7 @@
     _contentView = [UIView new];
     _contentView.backgroundColor = [UIColor whiteColor];
     _contentView.frame = CGRectMake(25, 200,
-    [UIScreen mainScreen].bounds.size.width - 50,[self isCurrentLanguageHans]? 380 : 480);
+    [UIScreen mainScreen].bounds.size.width - 50,[CommonUtil isCurrentLanguageHans]? 380 : 480);
     _contentView.layer.cornerRadius = 10;
     _contentView.layer.masksToBounds = YES;
     _contentView.userInteractionEnabled = YES;
@@ -325,9 +326,9 @@
     hLine.frame = CGRectMake(0, _contentView.bounds.size.height - 40, _contentView.bounds.size.width, 1);
     [_contentView addSubview:hLine];
     
-    UITextView *contentTextView = [[UITextView alloc] initWithFrame:CGRectMake(20, 70, _contentView.bounds.size.width - 40, [self isCurrentLanguageHans] ? 160 : 160)];
+    UITextView *contentTextView = [[UITextView alloc] initWithFrame:CGRectMake(20, 70, _contentView.bounds.size.width - 40, [CommonUtil isCurrentLanguageHans] ? 160 : 160)];
     NSString *string = NSLocalizedString(@"TCLogin.privacyDetail", nil);
-    if ([self isCurrentLanguageHans]){
+    if ([CommonUtil isCurrentLanguageHans]){
         contentTextView.attributedText = [self getDetailLabelAttributedText:string range1:NSMakeRange(96, 11)
         range2:NSMakeRange(285, 11) range3:NSMakeRange(424, 14) range4:NSMakeRange(509, 11)
         range5:NSMakeRange(599, 11) scrollDetai:YES];
@@ -349,9 +350,9 @@
     [self changeAlphaWithView:_alphaView];
     [_contentView addSubview:_alphaView];
     
-    UITextView *bottomTextView = [[UITextView alloc] initWithFrame:CGRectMake(20, 235, _contentView.bounds.size.width - 40, [self isCurrentLanguageHans] ? 105 : 205)];
+    UITextView *bottomTextView = [[UITextView alloc] initWithFrame:CGRectMake(20, 235, _contentView.bounds.size.width - 40, [CommonUtil isCurrentLanguageHans] ? 105 : 205)];
     NSString *text = NSLocalizedString(@"TCLogin.privacyBottom", nil);
-    if ([self isCurrentLanguageHans]){
+    if ([CommonUtil isCurrentLanguageHans]){
         bottomTextView.attributedText = [self getDetailLabelAttributedText:text range1:NSMakeRange(4, 9)
             range2:NSMakeRange(14, 11) range3:NSMakeRange(26, 15) range4:NSMakeRange(42, 14)
             range5:NSMakeRange(58, 10) scrollDetai:NO];
@@ -586,21 +587,6 @@
 
 - (void)_hideHUD {
     [[MBProgressHUD HUDForView:self.view] hideAnimated:YES];
-}
-
-/**
- 判断当前语言是否是简体中文
- */
-- (BOOL)isCurrentLanguageHans
-{
-    NSArray *languages = [NSLocale preferredLanguages];
-    NSString *currentLanguage = [languages objectAtIndex:0];
-    if ([currentLanguage isEqualToString:@"zh-Hans-CN"])
-    {
-        return YES;
-    }
-    
-    return NO;
 }
 
 #pragma mark - UITextFieldDelegate

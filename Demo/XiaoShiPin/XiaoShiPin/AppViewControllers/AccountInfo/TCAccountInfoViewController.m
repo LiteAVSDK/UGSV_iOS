@@ -741,21 +741,6 @@ UITextFieldDelegate>
     [self.navigationController pushViewController:next animated:YES];
 }
 
-/**
- 判断当前语言是否是简体中文
- */
-- (BOOL)isCurrentLanguageHans
-{
-    NSArray *languages = [NSLocale preferredLanguages];
-    NSString *currentLanguage = [languages objectAtIndex:0];
-    if ([currentLanguage isEqualToString:@"zh-Hans-CN"])
-    {
-        return YES;
-    }
-    
-    return NO;
-}
-
 #pragma mark - UICollectionView datasource
 
 - (NSInteger)numberOfSectionsInCollectionView:(UICollectionView *)collectionView {

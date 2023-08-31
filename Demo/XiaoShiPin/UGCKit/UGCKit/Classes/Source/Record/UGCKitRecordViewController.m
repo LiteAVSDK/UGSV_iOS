@@ -1132,20 +1132,6 @@ YTSDKLogListener,TXVideoCustomProcessDelegate,TXVideoCustomProcessListener,Beaut
     [self presentViewController:alertController animated:YES completion:nil];
 }
 
-/**
- 判断当前语言是否是简体中文
- */
-- (BOOL)isCurrentLanguageHans
-{
-    NSArray *languages = [NSLocale preferredLanguages];
-    NSString *currentLanguage = [languages objectAtIndex:0];
-    if ([currentLanguage isEqualToString:@"zh-Hans-CN"])
-    {
-        return YES;
-    }
-    
-    return NO;
-}
 
 -(IBAction)onTapCameraSwitch
 {
@@ -1761,25 +1747,28 @@ YTSDKLogListener,TXVideoCustomProcessDelegate,TXVideoCustomProcessListener,Beaut
     {
         _isCameraPreviewOn = YES;
         UITouch *touch = [[event allTouches] anyObject];
-        CGPoint _touchPoint = [touch locationInView:self.view];
-        if (NO == CGRectContainsPoint(_vBeauty.frame, _touchPoint) && _vBeautyShow)
+        CGPoint touchPoint = [touch locationInView:self.view];
+        if (NO == CGRectContainsPoint(_vBeauty.frame, touchPoint) && _vBeautyShow)
         {
             [self showBeauty];
         }
-        if (NO == CGRectContainsPoint(_vTXBeauty.frame, _touchPoint) && _vTXBeautyShow)
+        if (NO == CGRectContainsPoint(_vTXBeauty.frame, touchPoint) && _vTXBeautyShow)
         {
             [self showTXBeauty];
         }
     }
     if (_musicView && !_musicView.hidden) {
-        CGPoint _touchPoint = [[[event allTouches] anyObject] locationInView:self.view];
-        if (NO == CGRectContainsPoint(_musicView.frame, _touchPoint)){
+        CGPoint touchPoint = [[[event allTouches] anyObject] locationInView:self.view];
+        if (NO == CGRectContainsPoint(_musicView.frame, touchPoint)){
             _musicView.hidden = YES;
             // 隐藏面板的时候，停止播放音乐，否者录制时候开始会有一点点杂音
-            [[TXUGCRecord shareInstance] stopBGM];
+            if(_BGMPath){
+                [self onSetBGM:_BGMPath];
+                [[TXUGCRecord shareInstance] stopBGM];
+            }
             self.bgmPlaying = NO;
-            if (self.xMagicKit != nil) {
-                [self.xMagicKit setAudioMute:NO];
+            if (_xMagicKit) {
+                [_xMagicKit setAudioMute:NO];
             }
             [self hideBottomView:NO];
         }

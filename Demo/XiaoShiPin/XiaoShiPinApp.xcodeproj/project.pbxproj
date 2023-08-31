@@ -8,8 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		1726EFBE2769DD4300C8E597 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 453DE2BF2379458C0083E759 /* Assets.xcassets */; };
-		2B8972C6503E6121FE8C31D5 /* TXLiteAVSDK_UGC.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 648092190DB932852BBF3C12 /* TXLiteAVSDK_UGC.framework */; };
-		400443612837B52E00DAA0DE /* BuildFile in Frameworks */ = {isa = PBXBuildFile; };
 		400443652837B61F00DAA0DE /* TXFFmpeg.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 400443642837B61E00DAA0DE /* TXFFmpeg.xcframework */; };
 		400443662837B61F00DAA0DE /* TXFFmpeg.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 400443642837B61E00DAA0DE /* TXFFmpeg.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		400443692837B62600DAA0DE /* TXSoundTouch.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 400443682837B62600DAA0DE /* TXSoundTouch.xcframework */; };
@@ -84,6 +82,7 @@
 		45D52F74238D6998006F71FA /* PhotoUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = 45D52F71238D6998006F71FA /* PhotoUtil.m */; };
 		45D56F8B238E60FD008DA052 /* UGCKitWrapper.m in Sources */ = {isa = PBXBuildFile; fileRef = 45D56F8A238E60FD008DA052 /* UGCKitWrapper.m */; };
 		45E8294B2384EB7800702418 /* TCNavigationController.m in Sources */ = {isa = PBXBuildFile; fileRef = 45E8294A2384EB7800702418 /* TCNavigationController.m */; };
+		6E086BD32A8F723D00F86958 /* CommonUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = 6E086BD22A8F723D00F86958 /* CommonUtil.m */; };
 		6E650EE327D6F5A900D37497 /* TCAvatarListCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 6E650EE227D6F5A900D37497 /* TCAvatarListCell.m */; };
 		6E650F2127DA15FE00D37497 /* AboutViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6E650F2027DA15FE00D37497 /* AboutViewController.m */; };
 		6E650F2427DB379100D37497 /* DetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6E650F2327DB379100D37497 /* DetailViewController.m */; };
@@ -91,6 +90,7 @@
 		6E650F2C27DB4F1500D37497 /* DeleteAccountViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6E650F2B27DB4F1500D37497 /* DeleteAccountViewController.m */; };
 		6E7C329B28E43A2100E23B07 /* QuicClient.m in Sources */ = {isa = PBXBuildFile; fileRef = 6E7C329A28E43A2100E23B07 /* QuicClient.m */; };
 		BC42E64A1F750919B895C9AF /* Pods_XiaoShiPinApp.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 64C5E080F5371855F071110B /* Pods_XiaoShiPinApp.framework */; };
+		D9A4585C4ECCEEAA3C38B028 /* TXLiteAVSDK_UGC.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3B93D8338AD3ADDDD981CB63 /* TXLiteAVSDK_UGC.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -109,6 +109,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		3B93D8338AD3ADDDD981CB63 /* TXLiteAVSDK_UGC.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = TXLiteAVSDK_UGC.framework; path = ../../SDK/TXLiteAVSDK_UGC.framework; sourceTree = "<group>"; };
 		400443642837B61E00DAA0DE /* TXFFmpeg.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = TXFFmpeg.xcframework; path = ../../SDK/TXFFmpeg.xcframework; sourceTree = "<group>"; };
 		400443682837B62600DAA0DE /* TXSoundTouch.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = TXSoundTouch.xcframework; path = ../../SDK/TXSoundTouch.xcframework; sourceTree = "<group>"; };
 		4005886A25FBA72E00C518CC /* YTHandDetector.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = YTHandDetector.bundle; sourceTree = "<group>"; };
@@ -237,8 +238,9 @@
 		45D56F8A238E60FD008DA052 /* UGCKitWrapper.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = UGCKitWrapper.m; sourceTree = "<group>"; };
 		45E829492384EB7800702418 /* TCNavigationController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TCNavigationController.h; sourceTree = "<group>"; };
 		45E8294A2384EB7800702418 /* TCNavigationController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TCNavigationController.m; sourceTree = "<group>"; };
-		648092190DB932852BBF3C12 /* TXLiteAVSDK_UGC.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = TXLiteAVSDK_UGC.framework; path = ../../SDK/TXLiteAVSDK_UGC.framework; sourceTree = "<group>"; };
 		64C5E080F5371855F071110B /* Pods_XiaoShiPinApp.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_XiaoShiPinApp.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		6E086BD12A8F723D00F86958 /* CommonUtil.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CommonUtil.h; sourceTree = "<group>"; };
+		6E086BD22A8F723D00F86958 /* CommonUtil.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CommonUtil.m; sourceTree = "<group>"; };
 		6E650EE127D6F5A900D37497 /* TCAvatarListCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TCAvatarListCell.h; sourceTree = "<group>"; };
 		6E650EE227D6F5A900D37497 /* TCAvatarListCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TCAvatarListCell.m; sourceTree = "<group>"; };
 		6E650F1F27DA15FE00D37497 /* AboutViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AboutViewController.h; sourceTree = "<group>"; };
@@ -274,7 +276,7 @@
 				455AAEEB237ABBAA00AF4A3C /* libc++.tbd in Frameworks */,
 				BC42E64A1F750919B895C9AF /* Pods_XiaoShiPinApp.framework in Frameworks */,
 				40E96186283BB38800D4C80F /* CoreServices.framework in Frameworks */,
-				2B8972C6503E6121FE8C31D5 /* TXLiteAVSDK_UGC.framework in Frameworks */,
+				D9A4585C4ECCEEAA3C38B028 /* TXLiteAVSDK_UGC.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -418,7 +420,7 @@
 				455AAEEC237ABBAE00AF4A3C /* libresolv.tbd */,
 				455AAEEA237ABBAA00AF4A3C /* libc++.tbd */,
 				64C5E080F5371855F071110B /* Pods_XiaoShiPinApp.framework */,
-				648092190DB932852BBF3C12 /* TXLiteAVSDK_UGC.framework */,
+				3B93D8338AD3ADDDD981CB63 /* TXLiteAVSDK_UGC.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -508,6 +510,8 @@
 				45C56C2C237A9BE4009BDB9F /* NSData+Common.m */,
 				45C56C2D237A9BE4009BDB9F /* NSString+Common.h */,
 				45C56C2F237A9BE5009BDB9F /* NSString+Common.m */,
+				6E086BD12A8F723D00F86958 /* CommonUtil.h */,
+				6E086BD22A8F723D00F86958 /* CommonUtil.m */,
 			);
 			path = Util;
 			sourceTree = "<group>";
@@ -809,6 +813,7 @@
 				454616F923797E50009CDF83 /* HUDHelper.m in Sources */,
 				45C56C30237A9BE5009BDB9F /* NSData+Common.m in Sources */,
 				6E650F2127DA15FE00D37497 /* AboutViewController.m in Sources */,
+				6E086BD32A8F723D00F86958 /* CommonUtil.m in Sources */,
 				6E650F2C27DB4F1500D37497 /* DeleteAccountViewController.m in Sources */,
 				40F4D68D2473EC9800847F5B /* TVCClientInner.m in Sources */,
 				45C56C72237AA1E5009BDB9F /* TCVideoPublishController.m in Sources */,

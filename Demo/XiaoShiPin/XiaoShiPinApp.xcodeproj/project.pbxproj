@@ -7,37 +7,18 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0380445A2B47DA4E0085BE24 /* BuildFile in Frameworks */ = {isa = PBXBuildFile; };
 		1726EFBE2769DD4300C8E597 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 453DE2BF2379458C0083E759 /* Assets.xcassets */; };
+		2EEFD1677B4B0A08599B66F1 /* TXLiteAVSDK_UGC.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 04C0833E68BAC0A8D74CF173 /* TXLiteAVSDK_UGC.xcframework */; };
 		400443652837B61F00DAA0DE /* TXFFmpeg.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 400443642837B61E00DAA0DE /* TXFFmpeg.xcframework */; };
 		400443662837B61F00DAA0DE /* TXFFmpeg.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 400443642837B61E00DAA0DE /* TXFFmpeg.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		400443692837B62600DAA0DE /* TXSoundTouch.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 400443682837B62600DAA0DE /* TXSoundTouch.xcframework */; };
 		4004436A2837B62600DAA0DE /* TXSoundTouch.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 400443682837B62600DAA0DE /* TXSoundTouch.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		4005887625FBA72E00C518CC /* YTHandDetector.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 4005886A25FBA72E00C518CC /* YTHandDetector.bundle */; };
-		4005887725FBA72E00C518CC /* MSFMLandmarks46_relandmark_models.xbin in Resources */ = {isa = PBXBuildFile; fileRef = 4005886B25FBA72E00C518CC /* MSFMLandmarks46_relandmark_models.xbin */; };
-		4005887825FBA72E00C518CC /* RPNSegmenter.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 4005886C25FBA72E00C518CC /* RPNSegmenter.bundle */; };
-		4005887925FBA72E00C518CC /* e1 in Resources */ = {isa = PBXBuildFile; fileRef = 4005886D25FBA72E00C518CC /* e1 */; };
-		4005887A25FBA72E00C518CC /* u1 in Resources */ = {isa = PBXBuildFile; fileRef = 4005886E25FBA72E00C518CC /* u1 */; };
-		4005887B25FBA72E00C518CC /* v1 in Resources */ = {isa = PBXBuildFile; fileRef = 4005886F25FBA72E00C518CC /* v1 */; };
-		4005887C25FBA72E00C518CC /* detector.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 4005887025FBA72E00C518CC /* detector.bundle */; };
-		4005887D25FBA72E00C518CC /* AECore.metallib in Resources */ = {isa = PBXBuildFile; fileRef = 4005887125FBA72E00C518CC /* AECore.metallib */; };
-		4005887E25FBA72E00C518CC /* o1 in Resources */ = {isa = PBXBuildFile; fileRef = 4005887225FBA72E00C518CC /* o1 */; };
-		4005887F25FBA72E00C518CC /* poseest.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 4005887325FBA72E00C518CC /* poseest.bundle */; };
-		4005888025FBA72E00C518CC /* FilterEngine.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 4005887425FBA72E00C518CC /* FilterEngine.bundle */; };
-		4005888125FBA72E00C518CC /* ufa.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 4005887525FBA72E00C518CC /* ufa.bundle */; };
 		409A4488286C3630004033CB /* ReplayKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 409A4487286C3630004033CB /* ReplayKit.framework */; };
 		40A37345246A3916004E3FC7 /* Bugly.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 40A37344246A3916004E3FC7 /* Bugly.framework */; };
 		40E96180283BB09D00D4C80F /* GLKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 40E9617F283BB09D00D4C80F /* GLKit.framework */; };
 		40E96184283BB0E800D4C80F /* MetalKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 40E96183283BB0E800D4C80F /* MetalKit.framework */; };
 		40E96186283BB38800D4C80F /* CoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 40E96185283BB38800D4C80F /* CoreServices.framework */; };
-		40F4D6822473EC9800847F5B /* TVCUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 40F4D66A2473EC9800847F5B /* TVCUtils.m */; };
-		40F4D6832473EC9800847F5B /* TXUGCPublish.m in Sources */ = {isa = PBXBuildFile; fileRef = 40F4D66C2473EC9800847F5B /* TXUGCPublish.m */; };
-		40F4D6842473EC9800847F5B /* TXUGCPublishUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = 40F4D6712473EC9800847F5B /* TXUGCPublishUtil.m */; };
-		40F4D6852473EC9800847F5B /* TVCReport.m in Sources */ = {isa = PBXBuildFile; fileRef = 40F4D6722473EC9800847F5B /* TVCReport.m */; };
-		40F4D6862473EC9800847F5B /* TVCCommon.m in Sources */ = {isa = PBXBuildFile; fileRef = 40F4D6742473EC9800847F5B /* TVCCommon.m */; };
-		40F4D68A2473EC9800847F5B /* TVCHttpMessageURLProtocol.m in Sources */ = {isa = PBXBuildFile; fileRef = 40F4D67A2473EC9800847F5B /* TVCHttpMessageURLProtocol.m */; };
-		40F4D68B2473EC9800847F5B /* TXUGCPublishOptCenter.m in Sources */ = {isa = PBXBuildFile; fileRef = 40F4D67B2473EC9800847F5B /* TXUGCPublishOptCenter.m */; };
-		40F4D68C2473EC9800847F5B /* TVCClient.m in Sources */ = {isa = PBXBuildFile; fileRef = 40F4D67F2473EC9800847F5B /* TVCClient.m */; };
-		40F4D68D2473EC9800847F5B /* TVCClientInner.m in Sources */ = {isa = PBXBuildFile; fileRef = 40F4D6812473EC9800847F5B /* TVCClientInner.m */; };
 		453DE2B52379458A0083E759 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 453DE2B42379458A0083E759 /* AppDelegate.m */; };
 		453DE2BB2379458A0083E759 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 453DE2BA2379458A0083E759 /* ViewController.m */; };
 		453DE2BE2379458A0083E759 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 453DE2BC2379458A0083E759 /* Main.storyboard */; };
@@ -88,9 +69,7 @@
 		6E650F2427DB379100D37497 /* DetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6E650F2327DB379100D37497 /* DetailViewController.m */; };
 		6E650F2927DB490100D37497 /* SettingViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6E650F2827DB490100D37497 /* SettingViewController.m */; };
 		6E650F2C27DB4F1500D37497 /* DeleteAccountViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6E650F2B27DB4F1500D37497 /* DeleteAccountViewController.m */; };
-		6E7C329B28E43A2100E23B07 /* QuicClient.m in Sources */ = {isa = PBXBuildFile; fileRef = 6E7C329A28E43A2100E23B07 /* QuicClient.m */; };
 		BC42E64A1F750919B895C9AF /* Pods_XiaoShiPinApp.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 64C5E080F5371855F071110B /* Pods_XiaoShiPinApp.framework */; };
-		D9A4585C4ECCEEAA3C38B028 /* TXLiteAVSDK_UGC.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3B93D8338AD3ADDDD981CB63 /* TXLiteAVSDK_UGC.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -109,48 +88,15 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		3B93D8338AD3ADDDD981CB63 /* TXLiteAVSDK_UGC.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = TXLiteAVSDK_UGC.framework; path = ../../SDK/TXLiteAVSDK_UGC.framework; sourceTree = "<group>"; };
+		04C0833E68BAC0A8D74CF173 /* TXLiteAVSDK_UGC.xcframework */ = {isa = PBXFileReference; includeInIndex = 1; name = TXLiteAVSDK_UGC.xcframework; path = ../../SDK/TXLiteAVSDK_UGC.xcframework; sourceTree = "<group>"; };
 		400443642837B61E00DAA0DE /* TXFFmpeg.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = TXFFmpeg.xcframework; path = ../../SDK/TXFFmpeg.xcframework; sourceTree = "<group>"; };
 		400443682837B62600DAA0DE /* TXSoundTouch.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = TXSoundTouch.xcframework; path = ../../SDK/TXSoundTouch.xcframework; sourceTree = "<group>"; };
-		4005886A25FBA72E00C518CC /* YTHandDetector.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = YTHandDetector.bundle; sourceTree = "<group>"; };
-		4005886B25FBA72E00C518CC /* MSFMLandmarks46_relandmark_models.xbin */ = {isa = PBXFileReference; lastKnownFileType = file; path = MSFMLandmarks46_relandmark_models.xbin; sourceTree = "<group>"; };
-		4005886C25FBA72E00C518CC /* RPNSegmenter.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = RPNSegmenter.bundle; sourceTree = "<group>"; };
-		4005886D25FBA72E00C518CC /* e1 */ = {isa = PBXFileReference; lastKnownFileType = file; path = e1; sourceTree = "<group>"; };
-		4005886E25FBA72E00C518CC /* u1 */ = {isa = PBXFileReference; lastKnownFileType = file; path = u1; sourceTree = "<group>"; };
-		4005886F25FBA72E00C518CC /* v1 */ = {isa = PBXFileReference; lastKnownFileType = file; path = v1; sourceTree = "<group>"; };
-		4005887025FBA72E00C518CC /* detector.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = detector.bundle; sourceTree = "<group>"; };
-		4005887125FBA72E00C518CC /* AECore.metallib */ = {isa = PBXFileReference; lastKnownFileType = "archive.metal-library"; path = AECore.metallib; sourceTree = "<group>"; };
-		4005887225FBA72E00C518CC /* o1 */ = {isa = PBXFileReference; lastKnownFileType = file; path = o1; sourceTree = "<group>"; };
-		4005887325FBA72E00C518CC /* poseest.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = poseest.bundle; sourceTree = "<group>"; };
-		4005887425FBA72E00C518CC /* FilterEngine.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = FilterEngine.bundle; sourceTree = "<group>"; };
-		4005887525FBA72E00C518CC /* ufa.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = ufa.bundle; sourceTree = "<group>"; };
 		409A4487286C3630004033CB /* ReplayKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ReplayKit.framework; path = System/Library/Frameworks/ReplayKit.framework; sourceTree = SDKROOT; };
 		40A37344246A3916004E3FC7 /* Bugly.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Bugly.framework; path = XiaoShiPin/Frameworks/Bugly.framework; sourceTree = "<group>"; };
 		40E9617F283BB09D00D4C80F /* GLKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLKit.framework; path = System/Library/Frameworks/GLKit.framework; sourceTree = SDKROOT; };
 		40E96181283BB0A400D4C80F /* Metal.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Metal.framework; path = System/Library/Frameworks/Metal.framework; sourceTree = SDKROOT; };
 		40E96183283BB0E800D4C80F /* MetalKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MetalKit.framework; path = System/Library/Frameworks/MetalKit.framework; sourceTree = SDKROOT; };
 		40E96185283BB38800D4C80F /* CoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreServices.framework; path = System/Library/Frameworks/CoreServices.framework; sourceTree = SDKROOT; };
-		40F4D6682473EC9800847F5B /* TXUGCPublishOptCenter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TXUGCPublishOptCenter.h; sourceTree = "<group>"; };
-		40F4D6692473EC9800847F5B /* TVCHttpMessageURLProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TVCHttpMessageURLProtocol.h; sourceTree = "<group>"; };
-		40F4D66A2473EC9800847F5B /* TVCUtils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TVCUtils.m; sourceTree = "<group>"; };
-		40F4D66B2473EC9800847F5B /* TVCHeader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TVCHeader.h; sourceTree = "<group>"; };
-		40F4D66C2473EC9800847F5B /* TXUGCPublish.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TXUGCPublish.m; sourceTree = "<group>"; };
-		40F4D66E2473EC9800847F5B /* TXUGCPublishListener.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TXUGCPublishListener.h; sourceTree = "<group>"; };
-		40F4D66F2473EC9800847F5B /* TXUGCPublishTypeDef.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TXUGCPublishTypeDef.h; sourceTree = "<group>"; };
-		40F4D6702473EC9800847F5B /* TXUGCPublish.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TXUGCPublish.h; sourceTree = "<group>"; };
-		40F4D6712473EC9800847F5B /* TXUGCPublishUtil.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TXUGCPublishUtil.m; sourceTree = "<group>"; };
-		40F4D6722473EC9800847F5B /* TVCReport.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TVCReport.m; sourceTree = "<group>"; };
-		40F4D6732473EC9800847F5B /* TVCClientInner.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TVCClientInner.h; sourceTree = "<group>"; };
-		40F4D6742473EC9800847F5B /* TVCCommon.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TVCCommon.m; sourceTree = "<group>"; };
-		40F4D6752473EC9800847F5B /* TVCClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TVCClient.h; sourceTree = "<group>"; };
-		40F4D67A2473EC9800847F5B /* TVCHttpMessageURLProtocol.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TVCHttpMessageURLProtocol.m; sourceTree = "<group>"; };
-		40F4D67B2473EC9800847F5B /* TXUGCPublishOptCenter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TXUGCPublishOptCenter.m; sourceTree = "<group>"; };
-		40F4D67C2473EC9800847F5B /* TVCReport.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TVCReport.h; sourceTree = "<group>"; };
-		40F4D67D2473EC9800847F5B /* TXUGCPublishUtil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TXUGCPublishUtil.h; sourceTree = "<group>"; };
-		40F4D67E2473EC9800847F5B /* TVCUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TVCUtils.h; sourceTree = "<group>"; };
-		40F4D67F2473EC9800847F5B /* TVCClient.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TVCClient.m; sourceTree = "<group>"; };
-		40F4D6802473EC9800847F5B /* TVCCommon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TVCCommon.h; sourceTree = "<group>"; };
-		40F4D6812473EC9800847F5B /* TVCClientInner.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TVCClientInner.m; sourceTree = "<group>"; };
 		453DE2B02379458A0083E759 /* XiaoShiPinApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = XiaoShiPinApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		453DE2B32379458A0083E759 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		453DE2B42379458A0083E759 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -251,8 +197,6 @@
 		6E650F2827DB490100D37497 /* SettingViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SettingViewController.m; sourceTree = "<group>"; };
 		6E650F2A27DB4F1500D37497 /* DeleteAccountViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DeleteAccountViewController.h; sourceTree = "<group>"; };
 		6E650F2B27DB4F1500D37497 /* DeleteAccountViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DeleteAccountViewController.m; sourceTree = "<group>"; };
-		6E7C329928E43A2100E23B07 /* QuicClient.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = QuicClient.h; sourceTree = "<group>"; };
-		6E7C329A28E43A2100E23B07 /* QuicClient.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = QuicClient.m; sourceTree = "<group>"; };
 		7216AF6672BE96A755F9A006 /* Pods-XiaoShiPinApp.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-XiaoShiPinApp.release.xcconfig"; path = "Target Support Files/Pods-XiaoShiPinApp/Pods-XiaoShiPinApp.release.xcconfig"; sourceTree = "<group>"; };
 		8C0241A1CF41E8DFFB38B885 /* Pods-XiaoShiPinApp.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-XiaoShiPinApp.debug.xcconfig"; path = "Target Support Files/Pods-XiaoShiPinApp/Pods-XiaoShiPinApp.debug.xcconfig"; sourceTree = "<group>"; };
 		CA1752BBB634FB42BC710760 /* Pods-XiaoShiPinApp.dailybuild.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-XiaoShiPinApp.dailybuild.xcconfig"; path = "Target Support Files/Pods-XiaoShiPinApp/Pods-XiaoShiPinApp.dailybuild.xcconfig"; sourceTree = "<group>"; };
@@ -276,7 +220,7 @@
 				455AAEEB237ABBAA00AF4A3C /* libc++.tbd in Frameworks */,
 				BC42E64A1F750919B895C9AF /* Pods_XiaoShiPinApp.framework in Frameworks */,
 				40E96186283BB38800D4C80F /* CoreServices.framework in Frameworks */,
-				D9A4585C4ECCEEAA3C38B028 /* TXLiteAVSDK_UGC.framework in Frameworks */,
+				2EEFD1677B4B0A08599B66F1 /* TXLiteAVSDK_UGC.xcframework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -293,70 +237,12 @@
 			path = Pods;
 			sourceTree = "<group>";
 		};
-		40F4D6672473EC9800847F5B /* VideoUpload */ = {
-			isa = PBXGroup;
-			children = (
-				40F4D6682473EC9800847F5B /* TXUGCPublishOptCenter.h */,
-				40F4D6692473EC9800847F5B /* TVCHttpMessageURLProtocol.h */,
-				40F4D66A2473EC9800847F5B /* TVCUtils.m */,
-				40F4D66B2473EC9800847F5B /* TVCHeader.h */,
-				40F4D66C2473EC9800847F5B /* TXUGCPublish.m */,
-				40F4D66D2473EC9800847F5B /* include */,
-				40F4D6712473EC9800847F5B /* TXUGCPublishUtil.m */,
-				40F4D6722473EC9800847F5B /* TVCReport.m */,
-				40F4D6732473EC9800847F5B /* TVCClientInner.h */,
-				40F4D6742473EC9800847F5B /* TVCCommon.m */,
-				40F4D6752473EC9800847F5B /* TVCClient.h */,
-				40F4D67A2473EC9800847F5B /* TVCHttpMessageURLProtocol.m */,
-				40F4D67B2473EC9800847F5B /* TXUGCPublishOptCenter.m */,
-				40F4D67C2473EC9800847F5B /* TVCReport.h */,
-				40F4D67D2473EC9800847F5B /* TXUGCPublishUtil.h */,
-				40F4D67E2473EC9800847F5B /* TVCUtils.h */,
-				40F4D67F2473EC9800847F5B /* TVCClient.m */,
-				40F4D6802473EC9800847F5B /* TVCCommon.h */,
-				40F4D6812473EC9800847F5B /* TVCClientInner.m */,
-				6E7C329928E43A2100E23B07 /* QuicClient.h */,
-				6E7C329A28E43A2100E23B07 /* QuicClient.m */,
-			);
-			path = VideoUpload;
-			sourceTree = "<group>";
-		};
-		40F4D66D2473EC9800847F5B /* include */ = {
-			isa = PBXGroup;
-			children = (
-				40F4D66E2473EC9800847F5B /* TXUGCPublishListener.h */,
-				40F4D66F2473EC9800847F5B /* TXUGCPublishTypeDef.h */,
-				40F4D6702473EC9800847F5B /* TXUGCPublish.h */,
-			);
-			path = include;
-			sourceTree = "<group>";
-		};
 		4500A69D2382513900147B05 /* Assets */ = {
 			isa = PBXGroup;
 			children = (
 				453EA3CA23A236D3007C45F2 /* FilterResource.bundle */,
-				4500A74C2383DE2500147B05 /* pitu */,
 			);
 			path = Assets;
-			sourceTree = "<group>";
-		};
-		4500A74C2383DE2500147B05 /* pitu */ = {
-			isa = PBXGroup;
-			children = (
-				4005887125FBA72E00C518CC /* AECore.metallib */,
-				4005887025FBA72E00C518CC /* detector.bundle */,
-				4005886D25FBA72E00C518CC /* e1 */,
-				4005887425FBA72E00C518CC /* FilterEngine.bundle */,
-				4005886B25FBA72E00C518CC /* MSFMLandmarks46_relandmark_models.xbin */,
-				4005887225FBA72E00C518CC /* o1 */,
-				4005887325FBA72E00C518CC /* poseest.bundle */,
-				4005886C25FBA72E00C518CC /* RPNSegmenter.bundle */,
-				4005886E25FBA72E00C518CC /* u1 */,
-				4005887525FBA72E00C518CC /* ufa.bundle */,
-				4005886F25FBA72E00C518CC /* v1 */,
-				4005886A25FBA72E00C518CC /* YTHandDetector.bundle */,
-			);
-			path = pitu;
 			sourceTree = "<group>";
 		};
 		453DE2A72379458A0083E759 = {
@@ -420,7 +306,7 @@
 				455AAEEC237ABBAE00AF4A3C /* libresolv.tbd */,
 				455AAEEA237ABBAA00AF4A3C /* libc++.tbd */,
 				64C5E080F5371855F071110B /* Pods_XiaoShiPinApp.framework */,
-				3B93D8338AD3ADDDD981CB63 /* TXLiteAVSDK_UGC.framework */,
+				04C0833E68BAC0A8D74CF173 /* TXLiteAVSDK_UGC.xcframework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -553,7 +439,6 @@
 		454616FA23797E80009CDF83 /* Dependencies */ = {
 			isa = PBXGroup;
 			children = (
-				40F4D6672473EC9800847F5B /* VideoUpload */,
 			);
 			path = Dependencies;
 			sourceTree = "<group>";
@@ -673,22 +558,10 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4005887625FBA72E00C518CC /* YTHandDetector.bundle in Resources */,
 				457BFBDB23901362004017FE /* InfoPlist.strings in Resources */,
 				453DE2C32379458C0083E759 /* LaunchScreen.storyboard in Resources */,
 				455AAF0A237AEF3C00AF4A3C /* Localizable.strings in Resources */,
-				4005887725FBA72E00C518CC /* MSFMLandmarks46_relandmark_models.xbin in Resources */,
-				4005888125FBA72E00C518CC /* ufa.bundle in Resources */,
-				4005887D25FBA72E00C518CC /* AECore.metallib in Resources */,
-				4005887F25FBA72E00C518CC /* poseest.bundle in Resources */,
-				4005887825FBA72E00C518CC /* RPNSegmenter.bundle in Resources */,
-				4005887B25FBA72E00C518CC /* v1 in Resources */,
-				4005887925FBA72E00C518CC /* e1 in Resources */,
-				4005887A25FBA72E00C518CC /* u1 in Resources */,
 				453DE2BE2379458A0083E759 /* Main.storyboard in Resources */,
-				4005887C25FBA72E00C518CC /* detector.bundle in Resources */,
-				4005888025FBA72E00C518CC /* FilterEngine.bundle in Resources */,
-				4005887E25FBA72E00C518CC /* o1 in Resources */,
 				1726EFBE2769DD4300C8E597 /* Assets.xcassets in Resources */,
 				45C56C6A237AA12E009BDB9F /* TCVideoEditPrevViewController.xib in Resources */,
 			);
@@ -775,18 +648,14 @@
 			files = (
 				454616E623797DCE009CDF83 /* TCLoginParam.m in Sources */,
 				453DE2BB2379458A0083E759 /* ViewController.m in Sources */,
-				40F4D68A2473EC9800847F5B /* TVCHttpMessageURLProtocol.m in Sources */,
 				45C56C52237A9F2E009BDB9F /* TCPlayViewCell.m in Sources */,
 				454616F623797E3D009CDF83 /* TCUploadHelper.m in Sources */,
 				45C56BCD237A97EB009BDB9F /* TCWebViewController.m in Sources */,
 				454616F123797DEA009CDF83 /* TCRegisterViewController.m in Sources */,
 				454616F023797DEA009CDF83 /* TCLoginViewController.m in Sources */,
 				454616B223797BD3009CDF83 /* TCUserInfoCell.m in Sources */,
-				40F4D6852473EC9800847F5B /* TVCReport.m in Sources */,
-				40F4D6822473EC9800847F5B /* TVCUtils.m in Sources */,
 				454616B323797BD3009CDF83 /* TCAccountInfoViewController.m in Sources */,
 				6E650F2927DB490100D37497 /* SettingViewController.m in Sources */,
-				40F4D6832473EC9800847F5B /* TXUGCPublish.m in Sources */,
 				454616DB23797D82009CDF83 /* TCLog.m in Sources */,
 				454616E723797DCE009CDF83 /* TCLoginModel.m in Sources */,
 				45E8294B2384EB7800702418 /* TCNavigationController.m in Sources */,
@@ -804,22 +673,16 @@
 				453DE2C62379458C0083E759 /* main.m in Sources */,
 				45C56C6B237AA12E009BDB9F /* TCVideoEditPrevViewController.m in Sources */,
 				45C56C31237A9BE5009BDB9F /* NSString+Common.m in Sources */,
-				40F4D68B2473EC9800847F5B /* TXUGCPublishOptCenter.m in Sources */,
 				45C56C53237A9F2E009BDB9F /* TCBasePlayViewController.m in Sources */,
-				40F4D68C2473EC9800847F5B /* TVCClient.m in Sources */,
-				6E7C329B28E43A2100E23B07 /* QuicClient.m in Sources */,
 				454616BC23797BED009CDF83 /* TCLiveListModel.m in Sources */,
-				40F4D6842473EC9800847F5B /* TXUGCPublishUtil.m in Sources */,
 				454616F923797E50009CDF83 /* HUDHelper.m in Sources */,
 				45C56C30237A9BE5009BDB9F /* NSData+Common.m in Sources */,
 				6E650F2127DA15FE00D37497 /* AboutViewController.m in Sources */,
 				6E086BD32A8F723D00F86958 /* CommonUtil.m in Sources */,
 				6E650F2C27DB4F1500D37497 /* DeleteAccountViewController.m in Sources */,
-				40F4D68D2473EC9800847F5B /* TVCClientInner.m in Sources */,
 				45C56C72237AA1E5009BDB9F /* TCVideoPublishController.m in Sources */,
 				454616EF23797DEA009CDF83 /* TXWechatInfoView.m in Sources */,
 				454616BD23797BED009CDF83 /* TCVideoListViewController.m in Sources */,
-				40F4D6862473EC9800847F5B /* TVCCommon.m in Sources */,
 				454616BB23797BED009CDF83 /* TCVideoListCell.m in Sources */,
 				45C56C50237A9F2E009BDB9F /* TCVodPlayViewController.m in Sources */,
 				454616AD23797BC8009CDF83 /* TCEditUserInfoViewController.m in Sources */,
@@ -1017,9 +880,10 @@
 					"$(inherited)",
 					"$(SRCROOT)/../../SDK/TXLiteAVSDK_Professional.framework/Headers",
 					"$(SRCROOT)/../../SDK/TXLiteAVSDK_UGC.framework/Headers",
+					"$(SRCROOT)/../../SDK/TXLiteAVSDK_Professional.xcframework",
 				);
 				INFOPLIST_FILE = XiaoShiPin/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1072,7 +936,7 @@
 					"$(SRCROOT)/../../SDK/TXLiteAVSDK_UGC.framework/Headers",
 				);
 				INFOPLIST_FILE = XiaoShiPin/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1178,7 +1042,7 @@
 					"$(SRCROOT)/../../SDK/TXLiteAVSDK_UGC.framework/Headers",
 				);
 				INFOPLIST_FILE = XiaoShiPin/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

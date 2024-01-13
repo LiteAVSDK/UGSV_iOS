@@ -22,12 +22,10 @@ TODO: Add long description of the pod here.
                        DESC
 
   s.homepage         = 'https://github.com/originleeli@tencent.com/UGCKit'
-  # s.screenshots     = 'www.example.com/screenshots_1', 'www.example.com/screenshots_2'
   s.license          = { :type => 'MIT', :file => 'LICENSE' }
   s.author           = { 'originleeli@tencent.com' => 'originleeli@tencent.com' }
   s.source           = { :git => 'https://github.com/originleeli@tencent.com/UGCKit.git', :tag => s.version.to_s }
-  # s.social_media_url = 'https://twitter.com/<TWITTER_USERNAME>'
-  s.ios.deployment_target = '11.0'
+  s.ios.deployment_target = '9.0'
   s.static_framework = true
   s.default_subspec = 'Professional'
   s.ios.framework    = ['SystemConfiguration','CoreTelephony', 'VideoToolbox', 'CoreGraphics', 'AVFoundation', 'Accelerate','AssetsLibrary']
@@ -37,10 +35,11 @@ TODO: Add long description of the pod here.
     ss.resources      = 'UGCKit/Assets/**/*'
     ss.source_files = 'UGCKit/Classes/**/*.{h,m}'
     framework_path="../../../SDK/TXLiteAVSDK_Professional.framework"
+    xcframework_path="../../../SDK/TXLiteAVSDK_Professional.xcframework/ios-arm64_armv7/TXLiteAVSDK_Professional.framework"
     ss.pod_target_xcconfig={
         'HEADER_SEARCH_PATHS'=> [
           "$(PODS_TARGET_SRCROOT)/#{framework_path}/Headers",
-          "$(PODS_TARGET_SRCROOT)/../../../SDK/TXLiteAVSDK_UGC.framework/Headers"
+          "$(PODS_TARGET_SRCROOT)/../../../SDK/TXLiteAVSDK_UGC.framework/Headers","$(PODS_TARGET_SRCROOT)/#{xcframework_path}/Headers"
         ]
     }
     ss.resource_bundles = {
@@ -52,8 +51,9 @@ TODO: Add long description of the pod here.
     ss.resources      = 'UGCKit/Assets/**/*'
     ss.source_files   = 'UGCKit/Classes/**/*.{h,m}'
     framework_path="../../../SDK/TXLiteAVSDK_UGC.framework"
+    xcframework_path="../../../SDK/TXLiteAVSDK_UGC.xcframework/ios-arm64_armv7/TXLiteAVSDK_UGC.framework"
     ss.pod_target_xcconfig = {
-        'HEADER_SEARCH_PATHS' => ["$(PODS_TARGET_SRCROOT)/#{framework_path}/Headers"]
+        'HEADER_SEARCH_PATHS' => ["$(PODS_TARGET_SRCROOT)/#{framework_path}/Headers","$(PODS_TARGET_SRCROOT)/#{xcframework_path}/Headers"]
     }
     ss.resource_bundles = {
       'UGCKitResources' => ['UGCKit/Localizable/**/*','UGCKit/Assets/**/*.{png,xcassets,bundle,storyboard,xib}']
@@ -61,4 +61,7 @@ TODO: Add long description of the pod here.
   end
   s.dependency 'BeautySettingKit'
   s.dependency 'xmagickit'
+  s.dependency 'QCloudQuic','6.2.8'
+  s.dependency 'QCloudCOSXML/Slim','6.2.6'
+  s.dependency 'AFNetworking','4.0.1'
 end

@@ -851,17 +851,16 @@ typedef void(^DownloadCallback)(bool download);
 }
 
 - (void)updateAllBeautyValue{
+    NSInteger oldSortType = _model.sortType;
+    // 同步之前设置的美颜项
+    _model.sortType = 0;
     for (int i=0; i < _model.beautyIDs.count; i++) {
         NSString *key = [_model.beautyIDs[i] key];
         if (![key isEqualToString:@"beauty.v.face"]) {
             [self updateCurrentBeautyIndex:i value:[_model.beautyIDs[i] beautyValue].floatValue extraConfig:[_model.beautyIDs[i] extraConfig]];
         }
     }
-    __weak __typeof(self)weakSelf = self;
-    dispatch_async(dispatch_get_main_queue(), ^{
-        __strong typeof(self) strongSelf = weakSelf;
-        [strongSelf collectionView:strongSelf.beautyCollection didSelectItemAtIndexPath:strongSelf.model.beautySelectedIndex];
-    });
+    _model.sortType = oldSortType;
 }
 
 - (void)updateCurrentBeautyIndex:(NSInteger) index value:(CGFloat)value extraConfig:(id)extraConfig {

@@ -9,6 +9,6 @@
 #ifndef SDKHeader_h
 #define SDKHeader_h
 
-#import "TXLiteAVSDK.h"
+#import <TXLiteAVSDK_UGC/TXLiteAVSDK.h>
 
 #endif /* SDKHeader_h */

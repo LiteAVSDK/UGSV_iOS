@@ -219,20 +219,10 @@ typedef NS_ENUM(NSInteger,EffectSelectType)
 {
     if (_generationView && !_generationView.hidden) {
         [_ugcEdit resumeGenerate];
-    }else{
-        UIViewController *rootVC = [UIApplication sharedApplication].keyWindow.rootViewController;
-        BOOL shouldResume = rootVC == self;
-        if ([rootVC isKindOfClass:[UINavigationController class]]) {
-            UINavigationController *nav = (UINavigationController *)rootVC;
-            if ([[nav viewControllers] lastObject] == self) {
-                shouldResume = YES;
-            }
-        }
-        if (shouldResume) {
-            [_ugcEdit resumePlay];
-            [self setPlayBtn:YES];
-            _isPlay = YES;
-        }
+    } else {
+        [_ugcEdit resumePlay];
+        [self setPlayBtn:YES];
+        _isPlay = YES;
     }
 }
 

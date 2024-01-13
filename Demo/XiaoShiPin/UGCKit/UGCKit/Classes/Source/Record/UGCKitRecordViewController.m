@@ -264,6 +264,10 @@ YTSDKLogListener,TXVideoCustomProcessDelegate,TXVideoCustomProcessListener,Beaut
   return output.textureData.texture;
 }
 
+- (void)onTextureDestoryed {
+    [self removeXMagic];
+}
+
 - (void)onLog:(YtSDKLoggerLevel) loggerLevel withInfo:(NSString * _Nonnull) logInfo{
     NSLog(@"[%ld]-%@", (long)loggerLevel, logInfo);
 }

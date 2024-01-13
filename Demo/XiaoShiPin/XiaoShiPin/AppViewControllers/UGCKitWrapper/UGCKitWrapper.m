@@ -15,6 +15,8 @@
 #import "TXUGCPublish.h"
 #import "TCUserInfoModel.h"
 #import "PhotoUtil.h"
+#import "TCLiveListModel.h"
+#import "TCVodPlayViewController.h"
 
 typedef NS_ENUM(NSInteger, TCVideoAction) {
     TCVideoActionNone,
@@ -266,13 +268,37 @@ typedef NS_ENUM(NSInteger, TCVideoAction) {
                 hud.mode = MBProgressHUDModeText;
                 hud.label.text = NSLocalizedString(@"TCVideoEditView.VideoReleasingSucceeded", nil);
                 [hud hideAnimated:YES afterDelay:0.3];
+                [_viewController dismissViewControllerAnimated:YES completion:nil];
+                
+                // 弹出播放
+                TCLiveInfo *liveInfo = [TCLiveInfo new];
+                liveInfo.title = title;
+                liveInfo.userid = [TCLoginParam shareInstance].identifier;
+                liveInfo.timestamp = [[NSDate date] timeIntervalSince1970];
+                liveInfo.playurl = result.videoURL;
+                liveInfo.reviewStatus = ReviewStatus_Normal;
+                liveInfo.userinfo = [TCLiveUserInfo new];
+                TCUserInfoData* userInfoData = [[TCUserInfoModel sharedInstance] getUserProfile];
+                liveInfo.userinfo.nickname = userInfoData.nickName;
+                liveInfo.userinfo.location = userInfoData.region;
+                liveInfo.userinfo.headpic = userInfoData.faceURL;
+                liveInfo.userinfo.frontcover = userInfoData.coverURL;
+                [self startVodPlay:liveInfo];
             } else {
                 [hud hideAnimated:YES];
                 [self showAlert:[NSString stringWithFormat:@"UploadUGCVideo Failed[%d]", errCode] message:msg];
+                [_viewController dismissViewControllerAnimated:YES completion:nil];
             }
-            [_viewController dismissViewControllerAnimated:YES completion:nil];
         }];
     }
+}
+
+-(void) startVodPlay:(TCLiveInfo *) liveInfo{
+    NSMutableArray* lives = [NSMutableArray arrayWithCapacity:1];
+    [lives addObject:liveInfo];
+    TCVodPlayViewController* _playVC = [[TCVodPlayViewController alloc] initWithPlayInfoS:lives liveInfo:liveInfo videoIsReady:nil];
+    _playVC.modalPresentationStyle = UIModalPresentationFullScreen;
+    [_viewController presentViewController:_playVC animated:YES completion:nil];
 }
 
 #pragma mark - Alerting

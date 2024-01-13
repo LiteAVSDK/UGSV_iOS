@@ -236,7 +236,7 @@ typedef NS_ENUM(NSInteger,DragDirection){
         liveIndex = (int)_liveInfos.count - CACHE_PLAYER;
         liveIndexOffset = 0;
     }
-    while (playerCount < CACHE_PLAYER) {
+    while (playerCount < CACHE_PLAYER && playerCount < _liveInfos.count) {
         TXVodPlayer *player = [[TXVodPlayer alloc] init];
         player.isAutoPlay = NO;
         TCLiveInfo *info = _liveInfos[liveIndex + liveIndexOffset];
@@ -505,7 +505,11 @@ typedef NS_ENUM(NSInteger,DragDirection){
         });
     }
     if (popViewController) {
-        [self.navigationController popViewControllerAnimated:YES];
+        if([self presentingViewController]){
+            [self dismissViewControllerAnimated:true completion:nil];
+        } else {
+            [self.navigationController popViewControllerAnimated:YES];
+        }
     }
 }
 

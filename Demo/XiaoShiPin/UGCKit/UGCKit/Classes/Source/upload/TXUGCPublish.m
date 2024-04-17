@@ -80,7 +80,7 @@
     if (param.videoPath == nil || param.videoPath.length == 0 ||
         [[NSFileManager defaultManager] fileExistsAtPath:param.videoPath] == NO) {
         VodLogError(@"publishVideo: invalid video file");
-        return -5;
+        return TVC_ERR_INVALID_VIDEOPATH;
     }
     _tvcConfig = [[TVCConfig alloc] init];
     _tvcConfig.signature = param.signature;
@@ -89,7 +89,7 @@
     _tvcConfig.enableResume = param.enableResume;
     _tvcConfig.sliceSize = param.sliceSize;
     _tvcConfig.concurrentCount = param.concurrentCount;
-    //_tvcConfig.cosRegion = param.cosRegion;
+    _tvcConfig.trafficLimit = param.trafficLimit;
     if(param.uploadResumController != nil) {
         _tvcConfig.uploadResumController = param.uploadResumController;
     } else {
@@ -161,17 +161,17 @@
     VodLogInfo(@"vodPublish version:%@", TVCVersion);
     if (_publishing == YES) {
         VodLogError(@"there is existing uncompleted publish task");
-        return -1;
+        return TVC_ERR_ERR_UGC_PUBLISHING;
     }
 
     if (param == nil) {
         VodLogError(@"publishVideo: invalid param");
-        return -2;
+        return TVC_ERR_UGC_INVALID_PARAME;
     }
 
     if (param.signature == nil || param.signature.length == 0) {
         VodLogError(@"publishVideo: invalid signature");
-        return -4;
+        return TVC_ERR_INVALID_SIGNATURE;
     }
 
     _publishing = YES;
@@ -213,7 +213,7 @@
     if (param.mediaPath == nil || param.mediaPath.length == 0 ||
         [[NSFileManager defaultManager] fileExistsAtPath:param.mediaPath] == NO) {
         VodLogError(@"publishMedia: invalid video file");
-        return -5;
+        return TVC_ERR_INVALID_VIDEOPATH;
     }
 
     _tvcConfig = [[TVCConfig alloc] init];
@@ -223,6 +223,7 @@
     _tvcConfig.enableResume = param.enableResume;
     _tvcConfig.sliceSize = param.sliceSize;
     _tvcConfig.concurrentCount = param.concurrentCount;
+    _tvcConfig.trafficLimit = param.trafficLimit;
     if(param.uploadResumController != nil) {
         _tvcConfig.uploadResumController = param.uploadResumController;
     } else {
@@ -285,18 +286,18 @@
 - (int)publishMedia:(TXMediaPublishParam *)param {
     VodLogInfo(@"vodPublish version:%@", TVCVersion);
     if (_publishing == YES) {
-        // VodLogError(@"there is existing uncompleted publish task");
-        return -1;
+        VodLogError(@"there is existing uncompleted publish task");
+        return TVC_ERR_ERR_UGC_PUBLISHING;
     }
 
     if (param == nil) {
-        VodLogError(@"publishMedia: invalid param");
-        return -2;
+        VodLogError(@"publishVideo: invalid param");
+        return TVC_ERR_UGC_INVALID_PARAME;
     }
 
     if (param.signature == nil || param.signature.length == 0) {
-        VodLogError(@"publishMedia: invalid signature");
-        return -4;
+        VodLogError(@"publishVideo: invalid signature");
+        return TVC_ERR_INVALID_SIGNATURE;
     }
 
     _publishing = YES;

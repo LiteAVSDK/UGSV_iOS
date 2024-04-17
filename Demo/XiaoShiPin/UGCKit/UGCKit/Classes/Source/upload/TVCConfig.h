@@ -30,6 +30,8 @@
 @property (nonatomic, assign) long sliceSize;
 // 上传并发数量
 @property (nonatomic, assign) int concurrentCount;
+// upload traffic limit
+@property (nonatomic, assign) long trafficLimit;
 ///续点控制器，可自定义对于续点的控制，默认创建UploadResumeDefaultController
 @property (nonatomic, strong) id<IUploadResumeController>  uploadResumController;
 @end

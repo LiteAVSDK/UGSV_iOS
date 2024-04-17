@@ -37,6 +37,7 @@ typedef void (^ChangedCurrentBeautyBlock)();
 - (void)enableBeautyCell:(BOOL)isEnable;
 - (void)updateAllBeautyValue;
 - (void)hide:(int)type;
+-(void)setSavedBeautyProperty;
 @end
 
 NS_ASSUME_NONNULL_END

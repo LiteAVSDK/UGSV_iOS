@@ -17,6 +17,7 @@
         _signature = @"";
         _userID = @"";
         _uploadResumController = nil;
+        _trafficLimit = -1;
     }
     return self;
 }

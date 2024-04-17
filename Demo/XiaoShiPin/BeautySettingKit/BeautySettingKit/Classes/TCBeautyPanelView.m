@@ -116,7 +116,6 @@ static TCBeautyPanelItem *makeMenuItem(NSString *title, UIImage *icon, id target
 @property(nonatomic, strong) NSMutableDictionary<NSNumber *, NSNumber *> *beautyLevelDic;    ///< 不同美颜类型下的数值
 @property(nonatomic, strong) NSMutableDictionary<NSString *, NSNumber *> *filterValueDic;    ///< 各滤镜的数值
 @property(nonatomic, strong) NSMutableDictionary<NSNumber *, NSNumber *> *saveBeautyLevelDic;    ///< 不同美颜类型下的数值
-@property(nonatomic, strong) NSMutableDictionary<NSString *, NSNumber *> *saveFilterValueDic;    ///< 各滤镜的数值
 @property(nonatomic, strong) UILabel *                                    sliderValueLabel;  ///< 滑杆数值显示
 @property(nonatomic, strong) UISlider *                                   slider;            ///< 数值调节滑杆
 @property(nonatomic, strong) NSURLSessionDownloadTask *                   operation;         ///< 资源下载
@@ -181,7 +180,6 @@ static TCBeautyPanelItem *makeMenuItem(NSString *title, UIImage *icon, id target
 /// 重置为默认值
 - (void)resetAndApplyValues {
     self.saveBeautyLevelDic = [_beautyLevelDic mutableCopy];
-    self.saveFilterValueDic = [_filterValueDic mutableCopy];
     // 默认值配置
     const BeautyMenuItem defaultBeautyStyle          = BeautyMenuItemPiTu;
     self.beautyStyle                                 = BeautyMenuItemPiTu;
@@ -271,7 +269,6 @@ static TCBeautyPanelItem *makeMenuItem(NSString *title, UIImage *icon, id target
         [performer setGreenScreenFile:nil];
     }
     self.beautyLevelDic = [_saveBeautyLevelDic mutableCopy];
-    self.filterValueDic = [_saveFilterValueDic mutableCopy];
 }
 
 - (void)recoverBeautyValues{
@@ -279,7 +276,7 @@ static TCBeautyPanelItem *makeMenuItem(NSString *title, UIImage *icon, id target
         self.beautyLevelDic = [self.saveBeautyLevelDic mutableCopy];
         [self _applyBeautySettings];
     }
-    if (self.saveFilterValueDic.count > 0 && _currentFilterIndex > 0) {
+    if (_filters.count > _currentFilterIndex && _currentFilterIndex > 0) {
         [self onSetFilterAtMenuIndex:_currentFilterIndex];
         NSString *filterID            = _filters[_currentFilterIndex - 1].identifier;
         // v7.2后的版本使用 setFilterStrength

@@ -17,6 +17,7 @@
 #import "XmagicResDownload.h"
 #import "XmagicKitTheme.h"
 #import "XMagic.h"
+#import "TEProperty.h"
 
 #define beautyCollectionHeight 100
 #define SUB_THIN_FACE 101  //瘦脸子菜单
@@ -52,6 +53,7 @@ typedef void(^DownloadCallback)(bool download);
 @property (strong, nonatomic) NSIndexPath *lastIndexPath;
 @property (nonatomic) int segType;
 @property (nonatomic) bool isOhterTabChange;
+@property (strong, nonatomic) NSMutableArray<TEProperty *> *usedTEPropertyList;
 //功能类别
 @property(nonatomic,copy) NSArray *tabTitles;
 @property int tabTag;
@@ -809,7 +811,7 @@ typedef void(^DownloadCallback)(bool download);
             return;
         }
         [_model.makeupIDS[index] setStrength: @(slider.value)];
-        [self.beautyKitRef configPropertyWithType:@"custom" withName:@"makeup.strength" withData:[NSString stringWithFormat:@"%.2f",[_model.makeupIDS[index] strength].floatValue] withExtraInfo:nil];
+        [self configBeauty:@"custom" key:@"makeup.strength" value:[NSString stringWithFormat:@"%.2f",[_model.makeupIDS[index] strength].floatValue] withExtraInfo:nil];
     } else if ( _model.sortType == SUB_THIN_FACE) {
         NSInteger index = _model.beautyThinFaceSelectedIndex.item;
         [self setLabelValue:[slider value]];
@@ -866,17 +868,17 @@ typedef void(^DownloadCallback)(bool download);
 - (void)updateCurrentBeautyIndex:(NSInteger) index value:(CGFloat)value extraConfig:(id)extraConfig {
     if (_model.sortType == 0) {
         NSString *key = [_model.beautyIDs[index] key];
-        [self.beautyKitRef configPropertyWithType:@"beauty" withName:key withData:[NSString stringWithFormat:@"%f",value] withExtraInfo:extraConfig];
+        [self configBeauty:@"beauty" key:key value:[NSString stringWithFormat:@"%f",value] withExtraInfo:extraConfig];
     } else if (_model.sortType == 1) {
         NSString *key = [_model.lutIDs[index] path];
         NSString *path = [@"lut.bundle/" stringByAppendingPathComponent:key];
         key = [self.theme.resourcePath stringByAppendingPathComponent:path];
-        [self.beautyKitRef configPropertyWithType:@"lut" withName:key withData:[NSString stringWithFormat:@"%f",value] withExtraInfo:nil];
+        [self configBeauty:@"lut" key:key value:[NSString stringWithFormat:@"%f",value] withExtraInfo:nil];
     } else if (_model.sortType == 2) {
         NSString *key = [_model.motionIDs[index] key];
         NSString *path = [_model.motionIDs[index] path];
         NSString *motionRootPath = path==nil?[[NSBundle mainBundle] pathForResource:@"MotionRes" ofType:@"bundle"]:path;
-        [self.beautyKitRef configPropertyWithType:@"motion" withName:key withData:motionRootPath withExtraInfo:nil];
+        [self configBeauty:@"motion" key:key value:motionRootPath withExtraInfo:nil];
     }
     else if (_model.sortType == 3) {
         NSString *key = [_model.makeupIDS[index] key];
@@ -904,16 +906,16 @@ typedef void(^DownloadCallback)(bool download);
         [self downloadResConfigBeauty:@"motion" key:key value:[[TCDownloadManager shareManager] getResPath] extraConfig:extraConfig];
     }else if(_model.sortType == SUB_THIN_FACE){
         NSString *key = [_model.beautyThinFaceIDs[index] key];
-        [self.beautyKitRef configPropertyWithType:@"beauty" withName:key withData:[NSString stringWithFormat:@"%f",value] withExtraInfo:extraConfig];
+        [self configBeauty:@"beauty" key:key value:[NSString stringWithFormat:@"%f",value] withExtraInfo:extraConfig];
     }else if(_model.sortType == SUB_LIP){
         NSString *key = [_model.beautylipIDs[index] key];
-        [self.beautyKitRef configPropertyWithType:@"beauty" withName:key withData:[NSString stringWithFormat:@"%f",value] withExtraInfo:extraConfig];
+        [self configBeauty:@"beauty" key:key value:[NSString stringWithFormat:@"%f",value] withExtraInfo:extraConfig];
     }else if(_model.sortType == SUB_CHEEK){
         NSString *key = [_model.beautyCheekIDs[index] key];
-        [self.beautyKitRef configPropertyWithType:@"beauty" withName:key withData:[NSString stringWithFormat:@"%f",value] withExtraInfo:extraConfig];
+        [self configBeauty:@"beauty" key:key value:[NSString stringWithFormat:@"%f",value] withExtraInfo:extraConfig];
     }else if(_model.sortType == SUB_DIMENSION){
         NSString *key = [_model.beautyDimensionIDs[index] key];
-        [self.beautyKitRef configPropertyWithType:@"beauty" withName:key withData:[NSString stringWithFormat:@"%f",value] withExtraInfo:extraConfig];
+        [self configBeauty:@"beauty" key:key value:[NSString stringWithFormat:@"%f",value] withExtraInfo:extraConfig];
     }else if(_model.sortType == SUB_MENU_2D){
         
         NSString *key = [_model.motion2DMenuIDS[index] key];
@@ -1254,6 +1256,7 @@ typedef void(^DownloadCallback)(bool download);
 
 -(void) configBeauty:(NSString *)type key:(NSString *)key value:(NSString *)value withExtraInfo:(id)extraConfig{
     [self.beautyKitRef configPropertyWithType:type withName:key withData:value withExtraInfo:extraConfig];
+    [self saveProperty:type propertyName:key propertyValue:value extraInfo:extraConfig];
     if (self.changedCurrentBeautyBlock != nil) {
         self.changedCurrentBeautyBlock();
     }
@@ -1307,6 +1310,33 @@ typedef void(^DownloadCallback)(bool download);
     }];
     
     [self.loadingView startAnimating];
+}
+
+-(void)saveProperty:(NSString *)propertyType propertyName:(NSString *)propertyName
+      propertyValue:(NSString *)propertyValue extraInfo:(id)extraInfo{
+    if(!_usedTEPropertyList){
+        _usedTEPropertyList = [NSMutableArray array];
+    }
+    for (TEProperty *property in _usedTEPropertyList) {
+        if([property.propertyName isEqualToString:propertyName]){
+            [_usedTEPropertyList removeObject:property];
+            break;
+        }
+    }
+    TEProperty *teProperty = [TEProperty new];
+    teProperty.propertyType = propertyType;
+    teProperty.propertyName = propertyName;
+    teProperty.propertyValue = propertyValue;
+    teProperty.extraInfo = extraInfo;
+    [_usedTEPropertyList addObject:teProperty];
+}
+
+-(void)setSavedBeautyProperty{
+    for (TEProperty *property in _usedTEPropertyList) {
+        [self.beautyKitRef configPropertyWithType:property.propertyType
+        withName:property.propertyName withData:property.propertyValue
+        withExtraInfo:property.extraInfo];
+    }
 }
 
 -(void)dismissLoading{

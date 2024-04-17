@@ -337,6 +337,7 @@ YTSDKLogListener,TXVideoCustomProcessDelegate,TXVideoCustomProcessListener,Beaut
         });
     };
     [_vTXBeauty updateAllBeautyValue];
+    [_vTXBeauty setSavedBeautyProperty];
 }
 
 - (instancetype)initWithConfig:(UGCKitRecordConfig *)config theme:(UGCKitTheme *)theme
@@ -1377,6 +1378,7 @@ YTSDKLogListener,TXVideoCustomProcessDelegate,TXVideoCustomProcessListener,Beaut
         return;
     }
 
+    _isCompletingRecord = NO;
     if (_recordState == RecordStateStopped) {
         [self startSDKRecord];
         return;

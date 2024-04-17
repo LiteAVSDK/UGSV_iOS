@@ -12,7 +12,7 @@
 #import "TquicRequest.h"
 #import "TquicConnection.h"
 #import "TquicResponse.h"
-#import "QCloudQuicConfig.h"
+#import "QCloudQuic/QCloudQuicConfig.h"
 #import "TVCCommon.h"
 #import "TVCLog.h"
 @interface QuicClient () <NSURLSessionDataDelegate>

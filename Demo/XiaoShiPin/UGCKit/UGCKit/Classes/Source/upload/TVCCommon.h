@@ -18,6 +18,7 @@
 #define PRE_UPLOAD_ANA_DNS_TIME_OUT 3000
 /// upload time out
 #define UPLOAD_TIME_OUT_SEC 120
+#define UPLOAD_CONNECT_TIME_OUT_MILL 5000
 
 
 typedef NS_ENUM(NSInteger, TVCResult){
@@ -29,6 +30,8 @@ typedef NS_ENUM(NSInteger, TVCResult){
     TVC_ERR_UGC_FINISH_REQ_FAILED = 1005,  //UGC结束上传请求失败
     TVC_ERR_UGC_FINISH_RSP_FAILED = 1006,  //UGC结束上传响应失败
     TVC_ERR_FILE_NOT_EXIST = 1008,         //传入的文件路径上文件不存在
+    TVC_ERR_ERR_UGC_PUBLISHING = 1009,      //视频正在上传中
+    TVC_ERR_UGC_INVALID_PARAME = 1010,      //无效参数
     TVC_ERR_INVALID_SIGNATURE = 1012,      //短视频上传签名为空
     TVC_ERR_INVALID_VIDEOPATH = 1013,      //视频路径为空
     TVC_ERR_USER_CANCLE = 1017,            //用户调用取消上传

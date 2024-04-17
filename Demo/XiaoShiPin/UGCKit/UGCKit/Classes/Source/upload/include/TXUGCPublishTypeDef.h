@@ -56,6 +56,9 @@ typedef NS_ENUM(NSInteger, TXPublishResultCode)
 @property (nonatomic, assign) BOOL                  enablePreparePublish;
 /// 分片大小,支持最小为1M,最大10M，默认0，代表上传文件大小除以10
 @property (nonatomic, assign) long                  sliceSize;
+// 限速值设置范围为819200~838860800，即100KB/s~100MB/s，如果超出该范围会返回400错误。该值设置较小的时候，建议将并发数量也设置为1个，防止超时
+// -1 表示不限速
+@property (nonatomic, assign) long                  trafficLimit;
 /// 分片上传并发数量，<=0 则表示SDK内部默认为2个
 @property (nonatomic, assign) int                   concurrentCount;
 @end
@@ -120,6 +123,9 @@ typedef NS_ENUM(NSInteger, TXMediaPublishResultCode)
 @property (nonatomic, assign) long                  sliceSize;
 /// 分片上传并发数量，<=0 则表示SDK内部默认为2个
 @property (nonatomic, assign) int                   concurrentCount;
+// 限速值设置范围为819200~838860800，即100KB/s~100MB/s，如果超出该范围会返回400错误。该值设置较小的时候，建议将并发数量也设置为1个，防止超时
+// -1 表示不限速
+@property (nonatomic, assign) long                  trafficLimit;
 ///续点控制器，可自定义对于续点的控制，默认创建UploadResumeDefaultController
 @property (nonatomic, strong) id<IUploadResumeController>  uploadResumController;
 @end

@@ -26,7 +26,10 @@ static NSString * const UserNameDesc = @"TCRegisterView.UserNameRule";
 static NSString * const PasswordRegex = @"^[a-zA-Z0-9_]+$";
 static NSString * const PasswordDesc = @"TCRegisterView.PasswordRule";
 
-
+/**
+ * 使用须知：该云点播账号为腾讯云所有，仅用于帮助您快速完成调试体验。账号有随时停用/更新的可能性，账号内的数据将不定期清除且不予恢复。
+ * 请勿将该账号直接用于正式环境，如您需要正式使用，请将该云点播账号替换为您的专属资源，保证您正式业务的安全与稳定。
+ */
 @interface TCLoginModel()
 {
     TCLoginParam *_loginParam;
@@ -35,6 +38,10 @@ static NSString * const PasswordDesc = @"TCRegisterView.PasswordRule";
 @property (nonatomic, copy) NSString* sign;
 @property (nonatomic, copy) NSString* txTime;
 @property (nonatomic, copy) NSString* accountType;
+/**
+ * 使用须知：该云点播账号为腾讯云所有，仅用于帮助您快速完成调试体验。账号有随时停用/更新的可能性，账号内的数据将不定期清除且不予恢复。
+ * 请勿将该账号直接用于正式环境，如您需要正式使用，请将该云点播账号替换为您的专属资源，保证您正式业务的安全与稳定。
+ */
 @property (nonatomic, assign) int sdkAppID;
 @end
 

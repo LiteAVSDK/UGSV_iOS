@@ -104,12 +104,6 @@ YTSDKLogListener,TXVideoCustomProcessDelegate,TXVideoCustomProcessListener,Beaut
     BOOL                            _openTXBeauty;     //使用高级美颜
     BOOL                            _preloadingVideos;
     // Chorus
-    TXVideoBeautyStyle              _beautyStyle;
-    float                           _beautyDepth;
-    float                           _whitenDepth;
-    float                           _ruddinessDepth;
-    float                           _eye_level;
-    float                           _face_level;
     
     BOOL                            _isCameraPreviewOn;
     //    BOOL                            _videoRecording;
@@ -370,10 +364,6 @@ YTSDKLogListener,TXVideoCustomProcessDelegate,TXVideoCustomProcessListener,Beaut
     _isFrontCamera = YES;
     _vBeautyShow = NO;
     _vTXBeautyShow = NO;
-
-    _beautyStyle = VIDOE_BEAUTY_STYLE_SMOOTH;
-    _beautyDepth = 6.3;
-    _whitenDepth = 2.7;
 
     _isCameraPreviewOn = NO;
     _recordState = RecordStateStopped;
@@ -1562,16 +1552,6 @@ YTSDKLogListener,TXVideoCustomProcessDelegate,TXVideoCustomProcessListener,Beaut
             [[TXUGCRecord shareInstance] setVideoRenderMode:VIDEO_RENDER_MODE_ADJUST_RESOLUTION];
         } else {
             [[TXUGCRecord shareInstance] setVideoRenderMode:VIDEO_RENDER_MODE_FULL_FILL_SCREEN];
-        }
-        
-        if (!self->_isFromMusicSelectVC) {
-            TXBeautyManager *beautyManager = [[TXUGCRecord shareInstance] getBeautyManager];
-            [beautyManager setBeautyStyle:(TXBeautyStyle)_beautyStyle];
-            [beautyManager setBeautyLevel:_beautyDepth];
-            [beautyManager setWhitenessLevel:_whitenDepth];
-            [beautyManager setRuddyLevel:_ruddinessDepth];
-            [beautyManager setEyeScaleLevel:_eye_level];
-            [beautyManager setFaceSlimLevel:_face_level];
         }
         
 #if POD_PITU

@@ -10,6 +10,10 @@
 #define TCConstants_h
 
 //Http配置
+/*
+ * 使用须知：该服务器地址为腾讯云所有，仅用于帮助您快速完成调试体验，有随时停用/更新的可能性，请勿用于直接将其用于正式环境，
+ * 如您需要正式使用，请将该服务器地址替换为您的专属资源，保证您正式业务的安全与稳定。
+ */
 #define kHttpServerAddr @"http://demo.vod2.myqcloud.com/lite/" //正式环境
 
 //数据上报

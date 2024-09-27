@@ -11,11 +11,13 @@
 @interface TVCUtils : NSObject
 
 /**
+ * Get accurate device model
  * 获取准确的设备型号
  */
 + (NSString *)tvc_deviceModelName;
 
 /**
+ * Get network type
  * 获取网络类型
  */
 + (int) tvc_getNetWorkType;

@@ -8,7 +8,8 @@
 
 #import <Foundation/Foundation.h>
 
-//服务器SNI（Server Name Indication）启动时，客户端相应启动此协议完成网络请求
+/// When the server SNI (Server Name Indication) is started, the client will start this protocol to complete network requests accordingly.
+/// 服务器SNI（Server Name Indication）启动时，客户端相应启动此协议完成网络请求
 @interface TVCHttpMessageURLProtocol : NSURLProtocol
 
 @end

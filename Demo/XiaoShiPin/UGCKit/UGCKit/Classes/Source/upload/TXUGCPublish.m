@@ -43,6 +43,7 @@
     TVCUploadParam *_tvcParam;
     TVCClient *_tvcClient;
     NSString *_userID;
+    NSString *_uploadKey;
     BOOL _isCancel;
 }
 
@@ -57,6 +58,7 @@
     if (self != nil) {
         _userID = @"";
         _isCancel = NO;
+        _uploadKey = @"";
         [self setIsDebug:true];
     }
     return self;
@@ -67,6 +69,27 @@
     if (self != nil) {
         _userID = userID;
         _isCancel = NO;
+        _uploadKey = @"";
+    }
+    return self;
+}
+
+- (id)initWithUploadKey:(NSString *)uploadKey {
+    self = [super init];
+    if (self != nil) {
+        _userID = @"";
+        _isCancel = NO;
+        _uploadKey = uploadKey;
+    }
+    return self;
+}
+
+- (id)initWithUserID:(NSString *)userID withUploadKey:(NSString *)uploadKey {
+    self = [super init];
+    if (self != nil) {
+        _userID = userID;
+        _isCancel = NO;
+        _uploadKey = uploadKey;
     }
     return self;
 }
@@ -107,7 +130,7 @@
     __weak __typeof(self) weakSelf = self;
 
     if (_tvcClient == nil) {
-        _tvcClient = [[TVCClient alloc] initWithConfig:_tvcConfig];
+        _tvcClient = [[TVCClient alloc] initWithConfig:_tvcConfig uploadSesssionKey:_uploadKey];
     } else {
         [_tvcClient updateConfig:_tvcConfig];
         [[TXUGCPublishOptCenter shareInstance] updateSignature:param.signature];
@@ -238,7 +261,7 @@
     _tvcParam.videoName = param.fileName;
     __weak __typeof(self) weakSelf = self;
     if (_tvcClient == nil) {
-        _tvcClient = [[TVCClient alloc] initWithConfig:_tvcConfig];
+        _tvcClient = [[TVCClient alloc] initWithConfig:_tvcConfig uploadSesssionKey:_uploadKey];
     } else {
         [_tvcClient updateConfig:_tvcConfig];
         [[TXUGCPublishOptCenter shareInstance] updateSignature:param.signature];
@@ -358,7 +381,8 @@
     }
 }
 
-/*
+/**
+ * Get report information.
  * 获取上报信息
  */
 - (NSDictionary *)getStatusInfo {

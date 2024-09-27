@@ -255,8 +255,9 @@ static NSString *tvc_combineTwoFingerPrint(unsigned char *fp1,unsigned char *fp2
 + (int) tvc_getNetWorkType
 {
     int NetworkType = 0; // UNKNOWN
-    
-    //创建零地址，0.0.0.0的地址表示查询本机的网络连接状态
+    // Create a zero address, the address of 0.0.0.0 indicates querying the network
+    // connection status of the local machine
+    // 创建零地址，0.0.0.0的地址表示查询本机的网络连接状态
     struct sockaddr_storage zeroAddress;
     
     bzero(&zeroAddress, sizeof(zeroAddress));
@@ -267,11 +268,13 @@ static NSString *tvc_combineTwoFingerPrint(unsigned char *fp1,unsigned char *fp2
     SCNetworkReachabilityRef defaultRouteReachability = SCNetworkReachabilityCreateWithAddress(NULL, (struct sockaddr *)&zeroAddress);
     SCNetworkReachabilityFlags flags;
     
-    //获得连接的标志
+    // Get connection flags
+    // 获得连接的标志
     BOOL didRetrieveFlags = SCNetworkReachabilityGetFlags(defaultRouteReachability, &flags);
     CFRelease(defaultRouteReachability);
     
-    //如果不能获取连接标志，则不能连接网络，直接返回
+    // If the connection flag cannot be obtained, the network cannot be connected and return directly
+    // 如果不能获取连接标志，则不能连接网络，直接返回
     if (!didRetrieveFlags)
     {
         return NetworkType;
@@ -364,7 +367,7 @@ static NSString *tvc_combineTwoFingerPrint(unsigned char *fp1,unsigned char *fp2
     uname(&systemInfo);
     NSString *deviceModel = [NSString stringWithCString:systemInfo.machine encoding:NSUTF8StringEncoding];
     
-    //iPhone 系列
+    // iPhone series
     if ([deviceModel isEqualToString:@"iPhone1,1"])    return @"iPhone 1G";
     if ([deviceModel isEqualToString:@"iPhone1,2"])    return @"iPhone 3G";
     if ([deviceModel isEqualToString:@"iPhone2,1"])    return @"iPhone 3GS";
@@ -386,14 +389,14 @@ static NSString *tvc_combineTwoFingerPrint(unsigned char *fp1,unsigned char *fp2
     if ([deviceModel isEqualToString:@"iPhone9,2"])    return @"iPhone 7 Plus (CDMA)";
     if ([deviceModel isEqualToString:@"iPhone9,4"])    return @"iPhone 7 Plus (GSM)";
     
-    //iPod 系列
+    // iPod series
     if ([deviceModel isEqualToString:@"iPod1,1"])      return @"iPod Touch 1G";
     if ([deviceModel isEqualToString:@"iPod2,1"])      return @"iPod Touch 2G";
     if ([deviceModel isEqualToString:@"iPod3,1"])      return @"iPod Touch 3G";
     if ([deviceModel isEqualToString:@"iPod4,1"])      return @"iPod Touch 4G";
     if ([deviceModel isEqualToString:@"iPod5,1"])      return @"iPod Touch 5G";
     
-    //iPad 系列
+    // iPad series
     if ([deviceModel isEqualToString:@"iPad1,1"])      return @"iPad";
     if ([deviceModel isEqualToString:@"iPad2,1"])      return @"iPad 2 (WiFi)";
     if ([deviceModel isEqualToString:@"iPad2,2"])      return @"iPad 2 (GSM)";

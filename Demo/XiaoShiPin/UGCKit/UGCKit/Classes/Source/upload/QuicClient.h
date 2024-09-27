@@ -11,7 +11,7 @@
 NS_ASSUME_NONNULL_BEGIN
 typedef void (^TXUGCQuicCompletion)(UInt64 cosTs,NSString* domain,NSString* region,BOOL isQuic);
  /**
-  *用来进行quic探测
+  * Used for QUIC detection.
   */
  @interface QuicClient : NSObject
  

@@ -14,7 +14,7 @@ target 'XiaoShiPinApp' do
   pod 'xmagickit', :path => 'xmagickit/xmagickit.podspec'
   pod "MJRefresh"
   pod "MBProgressHUD"
-  pod "SDWebImage"
+  pod "SDWebImage", "5.19.4"
 end
 
 

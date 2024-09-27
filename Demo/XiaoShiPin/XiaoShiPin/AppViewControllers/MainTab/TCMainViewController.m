@@ -441,7 +441,8 @@ typedef NS_ENUM(NSInteger, TCVideoAction) {
         [TCUtil downloadVideo:DEFAULT_CHORUS_URL cachePath:cachePath  process:^(CGFloat process) {
             [weakSelf onloadVideoProcess:process];
         } complete:^(NSString *videoPath) {
-            [weakSelf onloadVideoComplete:@[videoPath] recordStyle:UGCKitRecordStyleDuet];
+            NSArray<NSString *> *paths = videoPath != nil ? @[videoPath] : @[];
+            [weakSelf onloadVideoComplete:paths recordStyle:UGCKitRecordStyleDuet];
         }];
     }
     _botttomView.hidden = YES;
@@ -466,7 +467,8 @@ typedef NS_ENUM(NSInteger, TCVideoAction) {
         [TCUtil downloadVideo:DEFAULT_CHORUS_URL cachePath:cachePath  process:^(CGFloat process) {
             [weakSelf onloadVideoProcess:process];
         } complete:^(NSString *videoPath) {
-            [weakSelf onloadVideoComplete:@[videoPath, videoPath] recordStyle:UGCKitRecordStyleTrio];
+            NSArray<NSString *> *paths = videoPath != nil ? @[videoPath, videoPath] : @[];
+            [weakSelf onloadVideoComplete:paths recordStyle:UGCKitRecordStyleTrio];
         }];
     }
     _botttomView.hidden = YES;

@@ -74,7 +74,7 @@
         return;
     }
 
-    // 删除过期的session，并保存
+    // Delete expired sessions and save
     NSMutableDictionary *newSessionDic = [[NSMutableDictionary alloc] init];
     NSMutableDictionary *newTimeDic = [[NSMutableDictionary alloc] init];
     NSMutableDictionary *newLastModTimeDic = [[NSMutableDictionary alloc] init];
@@ -91,7 +91,7 @@
         }
     }
 
-    // 将newSessionDic 和 newTimeDic 保存文件
+    // Save newSessionDic and newTimeDic to file
     NSData *newSessionJsonData = [NSJSONSerialization dataWithJSONObject:newSessionDic options:0 error:&jsonErr];
     NSData *newTimeJsonData = [NSJSONSerialization dataWithJSONObject:newTimeDic options:0 error:&jsonErr];
     NSData *newLastModTimeJsonData = [NSJSONSerialization dataWithJSONObject:newLastModTimeDic options:0 error:&jsonErr];
@@ -113,12 +113,13 @@
     [[NSUserDefaults standardUserDefaults] synchronize];
 }
 
-- (ResumeCacheData *)getResumeData:(NSString *)filePath {
+- (ResumeCacheData *)getResumeData:(NSString *)filePath uploadSesssionKey:(NSString*)uploadSesssionKey{
     if (filePath == nil || filePath.length == 0) {
         return nil;
     }
-    // 使用md5作为key
-    NSString *sessionKey = [TXUGCPublishUtil getFileMD5StrFromPath:filePath];
+    // Use MD5 as the key
+    NSString *fileMd5Key = [TXUGCPublishUtil getFileMD5StrFromPath:filePath];
+    NSString *sessionKey = [NSString stringWithFormat:@"%@%@" ,fileMd5Key ,uploadSesssionKey];
     ResumeCacheData *cacheData = [[ResumeCacheData alloc] init];
 
     NSMutableDictionary *sessionDic = [[NSMutableDictionary alloc] init];
@@ -176,7 +177,7 @@
         VodLogWarning(@"TVCMultipartReumeData is invalid");
     }
 
-    // 删除过期的session，并保存
+    // Delete expired sessions and save
     NSMutableDictionary *newSessionDic = [[NSMutableDictionary alloc] init];
     NSMutableDictionary *newTimeDic = [[NSMutableDictionary alloc] init];
     NSMutableDictionary *newLastModTimeDic = [[NSMutableDictionary alloc] init];
@@ -193,8 +194,7 @@
         }
     }
 
-    // 将newSessionDic 和 newTimeDic 保存文件
-    // 保存文件
+    // Save newSessionDic and newTimeDic to file
     NSData *newSessionJsonData = [NSJSONSerialization dataWithJSONObject:sessionDic options:0 error:&jsonErr];
     NSData *newTimeJsonData = [NSJSONSerialization dataWithJSONObject:timeDic options:0 error:&jsonErr];
     NSData *newLastModTimeJsonData = [NSJSONSerialization dataWithJSONObject:lastModTimeDic options:0 error:&jsonErr];
@@ -210,17 +210,22 @@
 }
 
 - (BOOL)isResumeUploadVideo:(TVCUploadContext *)uploadContext withSessionKey:(NSString *)vodSessionKey
-            withFileModTime:(uint64_t)videoLastModTime withCoverModTime:(uint64_t)coverLastModTime {
+            withFileModTime:(uint64_t)videoLastModTime withCoverModTime:(uint64_t)coverLastModTime
+          uploadSesssionKey:(NSString*)uploadSesssionKey{
     return uploadContext.resumeData && uploadContext.resumeData.length > 0 && uploadContext && vodSessionKey && vodSessionKey.length > 0;
 }
 
 - (void)saveSession:(NSString *)filePath withSessionKey:(NSString *)vodSessionKey withResumeData:(NSData *)resumeData
-     withUploadInfo:(TVCUploadContext *)uploadContext {
+     withUploadInfo:(TVCUploadContext *)uploadContext uploadSesssionKey:(NSString*)uploadSesssionKey{
     if (filePath == nil || filePath.length == 0) {
         return;
     }
-    // 使用md5作为keyfileSystemFileNumber
-    NSString *sessionKey = [TXUGCPublishUtil getFileMD5StrFromPath:filePath];
+    // Use MD5 as the keyfileSystemFileNumber
+    NSString *fileMd5Key = [TXUGCPublishUtil getFileMD5StrFromPath:filePath];
+    if (fileMd5Key == nil || fileMd5Key.length == 0) {
+        return;
+    }
+    NSString *sessionKey = [NSString stringWithFormat:@"%@%@" ,fileMd5Key ,uploadSesssionKey];
 
     NSMutableDictionary *sessionDic = [[NSMutableDictionary alloc] init];
     NSMutableDictionary *timeDic = [[NSMutableDictionary alloc] init];
@@ -270,7 +275,7 @@
         resumeDataDic = [NSMutableDictionary dictionaryWithDictionary:dic];
     }
 
-    // 设置过期时间为1天
+    // Set the expiration time to 1 day
     NSInteger expireTime = (NSInteger)[[NSDate date] timeIntervalSince1970] + 24 * 60 * 60;
     uint64_t lastModTime = 0;
     uint64_t coverLastModTime = 0;
@@ -279,7 +284,7 @@
         coverLastModTime = uploadContext.coverLastModTime;
     }
 
-    // session、resumeDataDic 为空，lastModTime为0就表示删掉该 [key, value]
+    // If session and resumeDataDic are empty, and lastModTime is 0, it means to delete the [key, value]
     if (vodSessionKey == nil || vodSessionKey.length == 0 || resumeData == nil || resumeData.length == 0 || lastModTime == 0) {
         [sessionDic removeObjectForKey:sessionKey];
         [timeDic removeObjectForKey:sessionKey];
@@ -295,7 +300,6 @@
         [resumeDataDic setValue:sResumeData forKey:sessionKey];
     }
 
-    // 保存文件
     NSData *newSessionJsonData = [NSJSONSerialization dataWithJSONObject:sessionDic options:0 error:&jsonErr];
     NSData *newTimeJsonData = [NSJSONSerialization dataWithJSONObject:timeDic options:0 error:&jsonErr];
     NSData *newLastModTimeJsonData = [NSJSONSerialization dataWithJSONObject:lastModTimeDic options:0 error:&jsonErr];

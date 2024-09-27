@@ -61,7 +61,7 @@ TODO: Add long description of the pod here.
   end
   s.dependency 'BeautySettingKit'
   s.dependency 'xmagickit'
-  s.dependency 'QCloudQuic','6.3.2'
-  s.dependency 'QCloudCOSXML/Slim','6.2.6'
+  s.dependency 'QCloudQuic','6.3.9'
+  s.dependency 'QCloudCOSXML/Slim','6.3.8'
   s.dependency 'AFNetworking','4.0.1'
 end

@@ -44,7 +44,7 @@
 }
  
  -(void)sendQuicRequest:(NSString *)domain ip:(NSString *)ip region:(NSString *)region completion:(TXUGCQuicCompletion)completion{
-     NSString *reqUrl = [NSString stringWithFormat:@"http://%@", domain];
+     NSString *reqUrl = [NSString stringWithFormat:@"https://%@", domain];
      TquicRequest *req = [[TquicRequest alloc] initWithURL:[NSURL URLWithString:reqUrl]
                                                           host:domain
                                                     httpMethod:@"HEAD"

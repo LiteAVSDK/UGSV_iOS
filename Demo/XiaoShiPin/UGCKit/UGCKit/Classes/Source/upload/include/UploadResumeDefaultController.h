@@ -11,13 +11,24 @@
 #ifndef UploadResumeDefaultController_h
 #define UploadResumeDefaultController_h
 
-#define TVCMultipartResumeSessionKey        @"TVCMultipartResumeSessionKey"         // 点播vodSessionKey
-#define TVCMultipartResumeExpireTimeKey     @"TVCMultipartResumeExpireTimeKey"      // vodSessionKey过期时间
-#define TVCMultipartFileLastModTime         @"TVCMultipartFileLastModTime"          // 文件最后修改时间，用于在断点续传的时候判断文件是否修改
-#define TVCMultipartCoverFileLastModTime    @"TVCMultipartCoverFileLastModTime"     // 封面文件最后修改时间
-#define TVCMultipartResumeData              @"TVCMultipartUploadResumeData"         // cos分片上传文件resumeData
+/// VOD session key
+/// 点播vodSessionKey
+#define TVCMultipartResumeSessionKey        @"TVCMultipartResumeSessionKey"
+/// Expiration time of VOD session key
+/// vodSessionKey过期时间
+#define TVCMultipartResumeExpireTimeKey     @"TVCMultipartResumeExpireTimeKey"
+/// File last modified time, used to determine if the file has been modified during breakpoint resume
+/// 文件最后修改时间，用于在断点续传的时候判断文件是否修改
+#define TVCMultipartFileLastModTime         @"TVCMultipartFileLastModTime"
+/// Last modified time of the cover file
+/// 封面文件最后修改时间
+#define TVCMultipartCoverFileLastModTime    @"TVCMultipartCoverFileLastModTime"
+/// Resume data for COS chunked upload file
+/// cos分片上传文件resumeData
+#define TVCMultipartResumeData              @"TVCMultipartUploadResumeData"
 
 /**
+ Default breakpoint controller
  默认续点控制器
  */
 @interface UploadResumeDefaultController : NSObject<IUploadResumeController>

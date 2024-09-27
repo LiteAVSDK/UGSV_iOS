@@ -13,7 +13,6 @@
 #import "TVCClientInner.h"
 #import "TVCCommon.h"
 #import "TVCReport.h"
-#import "AppLocalized.h"
 #include <arpa/inet.h>
 #include <netdb.h>
 #import "TVCLog.h"
@@ -23,7 +22,7 @@
 #define PATTERN_IP_V4 @"^(\\d|[1-9]\\d|1\\d{2}|2[0-4]\\d|25[0-5])(\\.(\\d|[1-9]\\d|1\\d{2}|2[0-4]\\d|25[0-5])){3}$"
 #define PATTERN_IP_V6 @"^((([0-9A-Fa-f]{1,4}:){7}[0-9A-Fa-f]{1,4})|(([0-9A-Fa-f]{1,4}:){1,7}:)|(([0-9A-Fa-f]{1,4}:){6}:[0-9A-Fa-f]{1,4})|(([0-9A-Fa-f]{1,4}:){5}(:[0-9A-Fa-f]{1,4}){1,2})|(([0-9A-Fa-f]{1,4}:){4}(:[0-9A-Fa-f]{1,4}){1,3})|(([0-9A-Fa-f]{1,4}:){3}(:[0-9A-Fa-f]{1,4}){1,4})|(([0-9A-Fa-f]{1,4}:){2}(:[0-9A-Fa-f]{1,4}){1,5})|([0-9A-Fa-f]{1,4}:(:[0-9A-Fa-f]{1,4}){1,6})|(:(:[0-9A-Fa-f]{1,4}){1,7})|(([0-9A-Fa-f]{1,4}:){6}(\\d|[1-9]\\d|1\\d{2}|2[0-4]\\d|25[0-5])(\\.(\\d|[1-9]\\d|1\\d{2}|2[0-4]\\d|25[0-5])){3})|(([0-9A-Fa-f]{1,4}:){5}:(\\d|[1-9]\\d|1\\d{2}|2[0-4]\\d|25[0-5])(\\.(\\d|[1-9]\\d|1\\d{2}|2[0-4]\\d|25[0-5])){3})|(([0-9A-Fa-f]{1,4}:){4}(:[0-9A-Fa-f]{1,4}){0,1}:(\\d|[1-9]\\d|1\\d{2}|2[0-4]\\d|25[0-5])(\\.(\\d|[1-9]\\d|1\\d{2}|2[0-4]\\d|25[0-5])){3})|(([0-9A-Fa-f]{1,4}:){3}(:[0-9A-Fa-f]{1,4}){0,2}:(\\d|[1-9]\\d|1\\d{2}|2[0-4]\\d|25[0-5])(\\.(\\d|[1-9]\\d|1\\d{2}|2[0-4]\\d|25[0-5])){3})|(([0-9A-Fa-f]{1,4}:){2}(:[0-9A-Fa-f]{1,4}){0,3}:(\\d|[1-9]\\d|1\\d{2}|2[0-4]\\d|25[0-5])(\\.(\\d|[1-9]\\d|1\\d{2}|2[0-4]\\d|25[0-5])){3})|([0-9A-Fa-f]{1,4}:(:[0-9A-Fa-f]{1,4}){0,4}:(\\d|[1-9]\\d|1\\d{2}|2[0-4]\\d|25[0-5])(\\.(\\d|[1-9]\\d|1\\d{2}|2[0-4]\\d|25[0-5])){3})|(:(:[0-9A-Fa-f]{1,4}){0,5}:(\\d|[1-9]\\d|1\\d{2}|2[0-4]\\d|25[0-5])(\\.(\\d|[1-9]\\d|1\\d{2}|2[0-4]\\d|25[0-5])){3}))$"
 
-#define HTTPDNS_SERVER @"https://119.29.29.99/d?dn="  // httpdns服务器
+#define HTTPDNS_SERVER @"https://119.29.29.99/d?dn="
 #define HTTPDNS_TOKEN @"800654663"
 
 typedef void (^TXUGCCompletion)(int result);
@@ -101,7 +100,7 @@ static BOOL gEnableQuic = YES;
     _signature = signature;
 }
 
-//刷新httpdns
+// Refresh HTTPDNS
 - (Boolean)reFresh:(TXUGCPrepareUploadCompletion)prepareUploadComplete {
     @synchronized(_cosRegionInfo) {
         _minCosRespTime = 0;
@@ -115,11 +114,11 @@ static BOOL gEnableQuic = YES;
     if (_signature == nil || _signature.length == 0) {
         return false;
     }
-    //清掉dns缓存
+    // Clear DNS cache
     [_cacheMap removeAllObjects];
     [_fixCacheMap removeAllObjects];
 
-    //使用了代理，不走httpdns
+    // Using a proxy, do not use HTTPDNS
     if ([self useProxy]) {
         return false;
     }
@@ -198,6 +197,7 @@ static BOOL gEnableQuic = YES;
 }
 
 /**
+ Determine if the IP address is valid
  判断ip地址是否有效
  */
 - (BOOL)checkIPAddreddIsValid:(NSString*)ipAddress
@@ -209,6 +209,7 @@ static BOOL gEnableQuic = YES;
     [self.regexIpv6 firstMatchInString:ipAddress options:0 range:NSMakeRange(0, [ipAddress length])];
 }
 
+// Since NSMutableDictionary is not thread-safe, a separate locking method is created here
 // 由于NSMutableDictionary不是线程安全的，这里单独起一个加锁方法
 - (void)setCacheValue:(NSString *)domain ipLists:(NSArray *)ipLists {
     @synchronized (self) {
@@ -216,9 +217,10 @@ static BOOL gEnableQuic = YES;
     }
 }
 
-//监控网络接入变化
+// Monitor network access changes
+// 监控网络接入变化
 - (void)monitorNetwork {
-    //网络切换的时候刷新一下httpdns
+    // Refresh HTTPDNS when the network switches
     [[AFNetworkReachabilityManager sharedManager] setReachabilityStatusChangeBlock:^(AFNetworkReachabilityStatus status) {
         switch (status) {
             case AFNetworkReachabilityStatusUnknown:
@@ -244,6 +246,7 @@ static BOOL gEnableQuic = YES;
     }];
 }
 
+// Add the IP list of the specified domain, the IP list is returned by the backend
 // 添加指定域名的ip列表，ip列表是后台返回的
 - (void)addDomainDNS:(NSString *)domain ipLists:(NSArray *)ipLists {
     if ([self useProxy]) {
@@ -257,17 +260,20 @@ static BOOL gEnableQuic = YES;
     [_fixCacheMap setValue:ipLists forKey:domain];
 }
 
+// Get the IP lists corresponding to the specified domain
 // 获取指定域名对应的ipLists
 - (NSArray *)query:(NSString *)hostname {
-    if ([[_cacheMap objectForKey:hostname] count] > 0) {
-        return [_cacheMap objectForKey:hostname];
-    } else if ([[_fixCacheMap objectForKey:hostname] count] > 0) {
-        return [_fixCacheMap objectForKey:hostname];
-    } else {
-        NSArray *ipArray = [self queryIpWithDomain:hostname];
-        if([ipArray count] > 0) {
-            [_cacheMap setValue:ipArray forKey:hostname];
-            return ipArray;
+    if (hostname) {
+        if ([_cacheMap objectForKey:hostname] && [[_cacheMap objectForKey:hostname] count] > 0) {
+            return [_cacheMap objectForKey:hostname];
+        } else if ([_fixCacheMap objectForKey:hostname] && [[_fixCacheMap objectForKey:hostname] count] > 0) {
+            return [_fixCacheMap objectForKey:hostname];
+        } else {
+            NSArray *ipArray = [self queryIpWithDomain:hostname];
+            if([ipArray count] > 0) {
+                [_cacheMap setValue:ipArray forKey:hostname];
+                return ipArray;
+            }
         }
     }
 
@@ -278,7 +284,8 @@ static BOOL gEnableQuic = YES;
     return _cosRegionInfo.region;
 }
 
-//是否使用了代理
+// Whether a proxy is used
+// 是否使用了代理
 - (BOOL)useProxy {
     CFDictionaryRef dicRef = CFNetworkCopySystemProxySettings();
     if (NULL == dicRef) return NO;
@@ -288,14 +295,13 @@ static BOOL gEnableQuic = YES;
     NSString *proxy = (__bridge NSString *)proxyCFstr;
     CFRelease(dicRef);
     if (proxy != nil) {
-        //使用了代理
         return YES;
     }
-    //没有使用代理
     return NO;
 }
 
-//是否使用了httpdns
+// Whether HTTPDNS is used
+// 是否使用了httpdns
 - (BOOL)useHttpDNS:(NSString *)hostname {
     if ([self query:hostname] != nil) {
         return YES;
@@ -304,17 +310,24 @@ static BOOL gEnableQuic = YES;
 }
 
 - (void)addPublishing:(NSString *)videoPath {
-    [_publishingList setValue:[NSNumber numberWithBool:YES] forKey:videoPath];
+    @synchronized (_publishingList) {
+        [_publishingList setValue:[NSNumber numberWithBool:YES] forKey:videoPath];
+    }
 }
 
 - (void)delPublishing:(NSString *)videoPath {
-    [_publishingList removeObjectForKey:videoPath];
+    @synchronized (_publishingList) {
+        [_publishingList removeObjectForKey:videoPath];
+    }
 }
 
 - (BOOL)isPublishingPublishing:(NSString *)videoPath {
-    return [[_publishingList objectForKey:videoPath] boolValue];
+    @synchronized (_publishingList) {
+        return [[_publishingList objectForKey:videoPath] boolValue];
+    }
 }
 
+// Pre-upload (UGC interface)
 // 预上传（UGC接口）
 - (void)prepareUploadUGC {
     NSString *reqUrl =
@@ -391,7 +404,6 @@ static BOOL gEnableQuic = YES;
         return;
     }
 
-    // 最多并发8个请求
     int maxThreadCount = MIN(8, (int)cosArray.count * 2);
     NSOperationQueue *operationQueue = [[NSOperationQueue alloc] init];
     operationQueue.qualityOfService = NSQualityOfServiceUserInitiated;
@@ -426,7 +438,7 @@ static BOOL gEnableQuic = YES;
         (isRegionEmpty ? @""
                        : [NSString stringWithFormat:@"%@|%@", self.cosRegionInfo.region,
                                                     self.cosRegionInfo.domain]);
-    // 请求完成后，将quic超时时间置为默认
+    // After the request is completed, set the QUIC timeout to the default
     [QCloudQuicConfig shareConfig].total_timeout_millisec_ = UPLOAD_TIME_OUT_SEC * 1000;
     
     VodLogInfo(@"preUploadResult, domain:%@,isQuic:%d,costTime:%f", self.cosRegionInfo.domain, self.cosRegionInfo.isQuic, self.minCosRespTime);
@@ -459,7 +471,7 @@ static BOOL gEnableQuic = YES;
     }
 }
 
-
+// Send a HEAD request for detection
 // 发送head请求探测
 - (void)detectBestCosIP:(NSString *)domain region:(NSString *)region {
     NSArray* tmp = [self query:domain];
@@ -469,9 +481,9 @@ static BOOL gEnableQuic = YES;
     }
     NSString *reqUrl;
     if (ip) {
-        reqUrl = [NSString stringWithFormat:@"http://%@", ip];
+        reqUrl = [NSString stringWithFormat:@"https://%@", ip];
     } else {
-        reqUrl = [NSString stringWithFormat:@"http://%@", domain];
+        reqUrl = [NSString stringWithFormat:@"https://%@", domain];
     }
     VodLogInfo(@"detectDomain reqUrl[%@]", reqUrl);
 
@@ -503,7 +515,7 @@ static BOOL gEnableQuic = YES;
 }
 
 - (void)getCosDNS:(NSString *)domain ips:(NSString *)ips {
-    //返回的ip列表为空，首先执行httpdns
+    // If the returned IP list is empty, execute HTTPDNS first
     if (ips.length == 0) {
         dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
         [self freshDomain:domain
@@ -517,6 +529,7 @@ static BOOL gEnableQuic = YES;
     }
 }
 
+// Simple HTTP request wrapper
 // 简单包装http请求
 - (void)sendHttpRequest:(NSString *)reqUrl
                  method:(NSString *)method
@@ -615,7 +628,7 @@ static BOOL gEnableQuic = YES;
     return result;
 }
 
-//quic探测
+// QUIC detection
 -(void)quicTest:(NSString *)domain
          region:(NSString *)region{
     NSArray* tmp = [self query:domain];
@@ -625,10 +638,12 @@ static BOOL gEnableQuic = YES;
     }
     if(ip) {
         dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
-        __weak __typeof(self) weakSelf = self;
         QuicClient *quicClient = [QuicClient new];
         // hold quicClient when asycn sendQuicRequest
-        [_quicClientList addObject:quicClient];
+        @synchronized(_quicClientList) {
+            [_quicClientList addObject:quicClient];
+        }
+        __weak __typeof(self) weakSelf = self;
         [quicClient sendQuicRequest:domain ip:ip region:region
                          completion:^(UInt64 cosTs,NSString* domain,NSString* region,BOOL isQuic){
             __strong __typeof(weakSelf) self = weakSelf;
@@ -640,11 +655,13 @@ static BOOL gEnableQuic = YES;
                         [self comparisonTime:cosTs region:region domain:domain isQuic:YES];
                     }
                 }
-                dispatch_semaphore_signal(semaphore);
             }
+            dispatch_semaphore_signal(semaphore);
         }];
         dispatch_semaphore_wait(semaphore, dispatch_time(DISPATCH_TIME_NOW, PRE_UPLOAD_HTTP_DETECT_COMMON_TIMEOUT * 2 * NSEC_PER_MSEC));
-        [_quicClientList removeObject:quicClient];
+        @synchronized (_quicClientList) {
+            [_quicClientList removeObject:quicClient];
+        }
     }
 }
 

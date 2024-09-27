@@ -192,6 +192,7 @@ Advanced beauty function description";
 "UGCKit.Record.ErrorFlash" = "Unable to turn on flashlight";
 "UGCKit.Record.ErrorREC" = "Unable to record";
 "UGCKit.Record.ErrorTime" = "Video must be at least 5s in length";
+"UGCKit.Record.ErrorSave" = "Unable to save";
 "UGCKit.Record.ResourceLoadBegin" = "Start to load";
 "UGCKit.Record.ResourceLoading" = "Loading resource %d %%";
 "UGCKit.Record.ResourceLoadSucceeded" = "Loaded successfully";

@@ -756,11 +756,26 @@ YTSDKLogListener,TXVideoCustomProcessDelegate,TXVideoCustomProcessListener,Beaut
     [[TXUGCRecord shareInstance] snapshot:^(UIImage *image) {
         dispatch_async(dispatch_get_main_queue(), ^{
             UIImageView *imageView = [[UIImageView alloc] initWithImage:image];
-            UIImageWriteToSavedPhotosAlbum(image, self, @selector(image:didFinishSavingWithError:contextInfo:), (__bridge void*)imageView);
             imageView.contentMode = UIViewContentModeScaleAspectFit;
             imageView.frame = self.view.bounds;
             [self.view insertSubview:imageView belowSubview:self->_controlView.bottomMask];
             
+            if (@available(iOS 17, *)) {
+                UIImageWriteToSavedPhotosAlbum(image, self, @selector(image:didFinishSavingWithError:contextInfo:), (__bridge void*)imageView);
+            } else {
+                [PHPhotoLibrary requestAuthorization:^(PHAuthorizationStatus status) {
+                    if (status == PHAuthorizationStatusAuthorized) {
+                        UIImageWriteToSavedPhotosAlbum(image, self, @selector(image:didFinishSavingWithError:contextInfo:), (__bridge void*)imageView);
+                    } else {
+                        NSError *error = [NSError errorWithDomain:@"UGCKit" code:-1 userInfo:@{
+                            NSLocalizedDescriptionKey: [self->_theme localizedString:@"UGCKit.Record.ErrorSave"]
+                        }];
+                        dispatch_async(dispatch_get_main_queue(), ^{
+                            [self image:image didFinishSavingWithError:error contextInfo:(__bridge void*)imageView];
+                        });
+                    }
+                }];
+            }
             CGAffineTransform t = CGAffineTransformMakeScale(0.33, 0.33);
             [UIView animateWithDuration:0.3 animations:^{
                 imageView.transform = t;

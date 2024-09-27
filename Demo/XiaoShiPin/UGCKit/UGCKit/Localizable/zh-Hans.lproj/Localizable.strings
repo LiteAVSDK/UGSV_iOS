@@ -190,6 +190,7 @@
 "UGCKit.Record.ErrorFlash" = "闪光灯启动失败";
 "UGCKit.Record.ErrorREC" = "录制失败";
 "UGCKit.Record.ErrorTime" = "至少要录够5秒";
+"UGCKit.Record.ErrorSave" = "保存失败";
 "UGCKit.Record.ResourceLoadBegin" = "开始加载资源";
 "UGCKit.Record.ResourceLoading" = "正在加载资源%d %%";
 "UGCKit.Record.ResourceLoadSucceeded" = "资源加载成功";

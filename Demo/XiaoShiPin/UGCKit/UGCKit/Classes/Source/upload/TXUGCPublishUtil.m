@@ -182,7 +182,8 @@
 
 +(void) removeCacheFile:(NSString*)filePath {
     if ([[NSFileManager defaultManager] fileExistsAtPath:filePath] == YES) {
-        [[NSFileManager defaultManager] removeItemAtPath:filePath error:nil]; //发布成功，删除视频文件
+        // Publish successfully, delete video file
+        [[NSFileManager defaultManager] removeItemAtPath:filePath error:nil];
     }
 }
 
@@ -262,7 +263,7 @@
 +(void)save:(UIImage*)uiImage ToPath:(NSString*)path
 {
     if (uiImage && path) {
-        // 保证目录存在
+        // Ensure directory exists
         [[NSFileManager defaultManager] createDirectoryAtPath:[path stringByDeletingLastPathComponent]
                                   withIntermediateDirectories:YES
                                                    attributes:nil
@@ -285,31 +286,41 @@
 }
 
 /**
- 获取文件前部分数据，
+ Get the first part of the file data
  */
 +(NSData*)getMD5FileStart:(NSFileHandle*)handle withTotalSize:(long)size {
-    return [handle readDataOfLength:MD5_REGION_SIZE];
+    if (handle.fileDescriptor != -1) {
+        return [handle readDataOfLength:MD5_REGION_SIZE];
+    }
+    return [[NSData alloc] init];
 }
 
 +(NSData*)getMD5FileMid:(NSFileHandle*)handle withTotalSize:(long)size {
-    // mid,总长度减去范围长度，除以2，就是文件中间MD5_REGION_SIZE个数据的开始索引
-    long midStart = (long) floor((size - MD5_REGION_SIZE) / 2.0);
-    [handle seekToFileOffset:midStart];
-    return [handle readDataToEndOfFile];
+    if (handle.fileDescriptor != -1) {
+        /// Mid, subtract the range length from the total length, divide by 2, and the result is the start index of the middle MD5_REGION_SIZE data in the file
+        /// mid,总长度减去范围长度，除以2，就是文件中间MD5_REGION_SIZE个数据的开始索引
+        long midStart = (long) floor((size - MD5_REGION_SIZE) / 2.0);
+        [handle seekToFileOffset:midStart];
+        return [handle readDataOfLength:MD5_REGION_SIZE];
+    }
+    return [[NSData alloc] init];
 }
 
 +(NSData*)getMD5FileEnd:(NSFileHandle*)handle withTotalSize:(long)size {
-    // last
-    long endStartPos = size - MD5_REGION_SIZE;
-    [handle seekToFileOffset:endStartPos];
-    return [handle readDataToEndOfFile];
+    if (handle.fileDescriptor != -1) {
+        // last
+        long endStartPos = size - MD5_REGION_SIZE;
+        [handle seekToFileOffset:endStartPos];
+        return [handle readDataToEndOfFile];
+    }
+    return [[NSData alloc] init];
 }
 
 + (NSString *)getFileMD5StrFromPath:(NSString *)path {
     NSFileHandle *handle = [NSFileHandle fileHandleForReadingAtPath:path];
     long fileSize = [[[NSFileManager defaultManager] attributesOfItemAtPath:path error:nil] fileSize];
-    if(handle== nil || fileSize <= 0) {
-        // 如果文件不存在
+    if(handle== nil || fileSize <= 0 || handle.fileDescriptor == -1) {
+        // If the file does not exist
         return @"";
     }
 

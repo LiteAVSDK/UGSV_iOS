@@ -21,7 +21,7 @@
 #define kMessage        @"message"
 #define kData           @"data"
 
-#define TVCVersion @"1.2.3.0"
+#define TVCVersion @"1.2.4.0"
 
 #pragma mark - COS config
 // Field deprecated, used as a placeholder field for InitUploadUGC
@@ -36,6 +36,7 @@
 @property(nonatomic,strong) NSString * imageFileId;
 
 /**
+ Number in JSON
  json中为数字
  */
 @property(nonatomic,strong) NSString * uploadAppid;

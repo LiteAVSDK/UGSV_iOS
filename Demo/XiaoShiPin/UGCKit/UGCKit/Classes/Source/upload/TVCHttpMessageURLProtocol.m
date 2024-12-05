@@ -358,6 +358,7 @@
         [aStream removeFromRunLoop:curRunLoop forMode:NSRunLoopCommonModes];
         [aStream setDelegate:nil];
         [aStream close];
+        // Notify the client that an error has occurred
         // 通知client发生错误了
         [self.client URLProtocol:self didFailWithError:[aStream streamError]];
     } else if (eventCode == NSStreamEventEndEncountered) {

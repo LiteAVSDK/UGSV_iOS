@@ -20,8 +20,12 @@
 #include <netdb.h>
 #import "TVCLog.h"
 
+// UNKNOWN_DEVICE_MODEL = "unknown";
+
+static NSString * const kUnKnownDeviceModel = @"unknown";
 static NSString * const kTVCPDDictionaryKey = @"com.tencent.liteavupload.uuidDictionaryKey";
 static NSString * const kTVCPDKeyChainKey = @"com.tencent.liteavupload.uuidkeychainKey";
+static NSString * kDeviceModel = nil;
 
 @implementation TVCUtils
 
@@ -363,6 +367,16 @@ static NSString *tvc_combineTwoFingerPrint(unsigned char *fp1,unsigned char *fp2
 
 + (NSString *)tvc_deviceModelName
 {
+    if (!kDeviceModel || kDeviceModel.length == 0) {
+        kDeviceModel = [self tvc_deviceModelNameBySys];
+        if (!kDeviceModel || kDeviceModel.length == 0) {
+            kDeviceModel = kUnKnownDeviceModel;
+        }
+    }
+    return kDeviceModel;
+}
+
++ (NSString *)tvc_deviceModelNameBySys {
     struct utsname systemInfo;
     uname(&systemInfo);
     NSString *deviceModel = [NSString stringWithCString:systemInfo.machine encoding:NSUTF8StringEncoding];
@@ -428,8 +442,8 @@ static NSString *tvc_combineTwoFingerPrint(unsigned char *fp1,unsigned char *fp2
     if ([deviceModel isEqualToString:@"iPad4,7"]
         ||[deviceModel isEqualToString:@"iPad4,8"]
         ||[deviceModel isEqualToString:@"iPad4,9"])      return @"iPad mini 3";
-    
     return deviceModel;
 }
+
 @end
 

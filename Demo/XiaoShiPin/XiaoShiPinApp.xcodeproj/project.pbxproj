@@ -62,13 +62,13 @@
 		45D52F74238D6998006F71FA /* PhotoUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = 45D52F71238D6998006F71FA /* PhotoUtil.m */; };
 		45D56F8B238E60FD008DA052 /* UGCKitWrapper.m in Sources */ = {isa = PBXBuildFile; fileRef = 45D56F8A238E60FD008DA052 /* UGCKitWrapper.m */; };
 		45E8294B2384EB7800702418 /* TCNavigationController.m in Sources */ = {isa = PBXBuildFile; fileRef = 45E8294A2384EB7800702418 /* TCNavigationController.m */; };
-		50C4251BE27A2FC6235D0924 /* TXLiteAVSDK_UGC.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 84090E995E26B1F349B1E763 /* TXLiteAVSDK_UGC.xcframework */; };
 		6E086BD32A8F723D00F86958 /* CommonUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = 6E086BD22A8F723D00F86958 /* CommonUtil.m */; };
 		6E650EE327D6F5A900D37497 /* TCAvatarListCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 6E650EE227D6F5A900D37497 /* TCAvatarListCell.m */; };
 		6E650F2127DA15FE00D37497 /* AboutViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6E650F2027DA15FE00D37497 /* AboutViewController.m */; };
 		6E650F2427DB379100D37497 /* DetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6E650F2327DB379100D37497 /* DetailViewController.m */; };
 		6E650F2927DB490100D37497 /* SettingViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6E650F2827DB490100D37497 /* SettingViewController.m */; };
 		6E650F2C27DB4F1500D37497 /* DeleteAccountViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6E650F2B27DB4F1500D37497 /* DeleteAccountViewController.m */; };
+		8A30E9C22D7DF576995EBAE8 /* TXLiteAVSDK_UGC.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = C54EC36B49BC871324A5F1F6 /* TXLiteAVSDK_UGC.xcframework */; };
 		BC42E64A1F750919B895C9AF /* Pods_XiaoShiPinApp.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 64C5E080F5371855F071110B /* Pods_XiaoShiPinApp.framework */; };
 /* End PBXBuildFile section */
 
@@ -197,8 +197,8 @@
 		6E650F2A27DB4F1500D37497 /* DeleteAccountViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DeleteAccountViewController.h; sourceTree = "<group>"; };
 		6E650F2B27DB4F1500D37497 /* DeleteAccountViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DeleteAccountViewController.m; sourceTree = "<group>"; };
 		7216AF6672BE96A755F9A006 /* Pods-XiaoShiPinApp.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-XiaoShiPinApp.release.xcconfig"; path = "Target Support Files/Pods-XiaoShiPinApp/Pods-XiaoShiPinApp.release.xcconfig"; sourceTree = "<group>"; };
-		84090E995E26B1F349B1E763 /* TXLiteAVSDK_UGC.xcframework */ = {isa = PBXFileReference; includeInIndex = 1; name = TXLiteAVSDK_UGC.xcframework; path = ../../SDK/TXLiteAVSDK_UGC.xcframework; sourceTree = "<group>"; };
 		8C0241A1CF41E8DFFB38B885 /* Pods-XiaoShiPinApp.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-XiaoShiPinApp.debug.xcconfig"; path = "Target Support Files/Pods-XiaoShiPinApp/Pods-XiaoShiPinApp.debug.xcconfig"; sourceTree = "<group>"; };
+		C54EC36B49BC871324A5F1F6 /* TXLiteAVSDK_UGC.xcframework */ = {isa = PBXFileReference; includeInIndex = 1; name = TXLiteAVSDK_UGC.xcframework; path = ../../SDK/TXLiteAVSDK_UGC.xcframework; sourceTree = "<group>"; };
 		CA1752BBB634FB42BC710760 /* Pods-XiaoShiPinApp.dailybuild.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-XiaoShiPinApp.dailybuild.xcconfig"; path = "Target Support Files/Pods-XiaoShiPinApp/Pods-XiaoShiPinApp.dailybuild.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -220,7 +220,7 @@
 				455AAEEB237ABBAA00AF4A3C /* libc++.tbd in Frameworks */,
 				BC42E64A1F750919B895C9AF /* Pods_XiaoShiPinApp.framework in Frameworks */,
 				40E96186283BB38800D4C80F /* CoreServices.framework in Frameworks */,
-				50C4251BE27A2FC6235D0924 /* TXLiteAVSDK_UGC.xcframework in Frameworks */,
+				8A30E9C22D7DF576995EBAE8 /* TXLiteAVSDK_UGC.xcframework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -306,7 +306,7 @@
 				455AAEEC237ABBAE00AF4A3C /* libresolv.tbd */,
 				455AAEEA237ABBAA00AF4A3C /* libc++.tbd */,
 				64C5E080F5371855F071110B /* Pods_XiaoShiPinApp.framework */,
-				84090E995E26B1F349B1E763 /* TXLiteAVSDK_UGC.xcframework */,
+				C54EC36B49BC871324A5F1F6 /* TXLiteAVSDK_UGC.xcframework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";

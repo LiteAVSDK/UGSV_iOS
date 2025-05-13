@@ -9,15 +9,15 @@
 #import "TXUGCPublishOptCenter.h"
 #import <Foundation/Foundation.h>
 #import <SystemConfiguration/CaptiveNetwork.h>
-#import "AFNetworkReachabilityManager.h"
+#import <AFNetworking/AFNetworkReachabilityManager.h>
 #import "TVCClientInner.h"
 #import "TVCCommon.h"
 #import "TVCReport.h"
 #include <arpa/inet.h>
 #include <netdb.h>
 #import "TVCLog.h"
-#import "QCloudQuic/QCloudQuicConfig.h"
 #import "QuicClient.h"
+#import "TVCQuicConfigProxy.h"
 
 #define PATTERN_IP_V4 @"^(\\d|[1-9]\\d|1\\d{2}|2[0-4]\\d|25[0-5])(\\.(\\d|[1-9]\\d|1\\d{2}|2[0-4]\\d|25[0-5])){3}$"
 #define PATTERN_IP_V6 @"^((([0-9A-Fa-f]{1,4}:){7}[0-9A-Fa-f]{1,4})|(([0-9A-Fa-f]{1,4}:){1,7}:)|(([0-9A-Fa-f]{1,4}:){6}:[0-9A-Fa-f]{1,4})|(([0-9A-Fa-f]{1,4}:){5}(:[0-9A-Fa-f]{1,4}){1,2})|(([0-9A-Fa-f]{1,4}:){4}(:[0-9A-Fa-f]{1,4}){1,3})|(([0-9A-Fa-f]{1,4}:){3}(:[0-9A-Fa-f]{1,4}){1,4})|(([0-9A-Fa-f]{1,4}:){2}(:[0-9A-Fa-f]{1,4}){1,5})|([0-9A-Fa-f]{1,4}:(:[0-9A-Fa-f]{1,4}){1,6})|(:(:[0-9A-Fa-f]{1,4}){1,7})|(([0-9A-Fa-f]{1,4}:){6}(\\d|[1-9]\\d|1\\d{2}|2[0-4]\\d|25[0-5])(\\.(\\d|[1-9]\\d|1\\d{2}|2[0-4]\\d|25[0-5])){3})|(([0-9A-Fa-f]{1,4}:){5}:(\\d|[1-9]\\d|1\\d{2}|2[0-4]\\d|25[0-5])(\\.(\\d|[1-9]\\d|1\\d{2}|2[0-4]\\d|25[0-5])){3})|(([0-9A-Fa-f]{1,4}:){4}(:[0-9A-Fa-f]{1,4}){0,1}:(\\d|[1-9]\\d|1\\d{2}|2[0-4]\\d|25[0-5])(\\.(\\d|[1-9]\\d|1\\d{2}|2[0-4]\\d|25[0-5])){3})|(([0-9A-Fa-f]{1,4}:){3}(:[0-9A-Fa-f]{1,4}){0,2}:(\\d|[1-9]\\d|1\\d{2}|2[0-4]\\d|25[0-5])(\\.(\\d|[1-9]\\d|1\\d{2}|2[0-4]\\d|25[0-5])){3})|(([0-9A-Fa-f]{1,4}:){2}(:[0-9A-Fa-f]{1,4}){0,3}:(\\d|[1-9]\\d|1\\d{2}|2[0-4]\\d|25[0-5])(\\.(\\d|[1-9]\\d|1\\d{2}|2[0-4]\\d|25[0-5])){3})|([0-9A-Fa-f]{1,4}:(:[0-9A-Fa-f]{1,4}){0,4}:(\\d|[1-9]\\d|1\\d{2}|2[0-4]\\d|25[0-5])(\\.(\\d|[1-9]\\d|1\\d{2}|2[0-4]\\d|25[0-5])){3})|(:(:[0-9A-Fa-f]{1,4}){0,5}:(\\d|[1-9]\\d|1\\d{2}|2[0-4]\\d|25[0-5])(\\.(\\d|[1-9]\\d|1\\d{2}|2[0-4]\\d|25[0-5])){3}))$"
@@ -49,6 +49,7 @@ static BOOL gEnableQuic = YES;
 @interface TXUGCPublishOptCenter()
 
 @property (nonatomic, strong) NSMutableArray *quicClientList;
+@property (nonatomic, strong) TVCQuicConfigProxy* quicProxy;
 
 @end
 
@@ -72,6 +73,7 @@ static BOOL gEnableQuic = YES;
         _signature = @"";
         _quicClientList = [[NSMutableArray alloc] init];
         _cosRegionInfo = [[TXUGCCosRegionInfo alloc] init];
+        self.quicProxy = [[TVCQuicConfigProxy alloc] init];
         [self monitorNetwork];
         _regexIpv4 = [NSRegularExpression regularExpressionWithPattern:PATTERN_IP_V4 options:0 error:nil];
         _regexIpv6 = [NSRegularExpression regularExpressionWithPattern:PATTERN_IP_V6 options:0 error:nil];
@@ -403,7 +405,7 @@ static BOOL gEnableQuic = YES;
         VodLogError(@"parsePrepareUploadRsp cosRegionList is null!");
         return;
     }
-
+    
     int maxThreadCount = MIN(8, (int)cosArray.count * 2);
     NSOperationQueue *operationQueue = [[NSOperationQueue alloc] init];
     operationQueue.qualityOfService = NSQualityOfServiceUserInitiated;
@@ -439,7 +441,7 @@ static BOOL gEnableQuic = YES;
                        : [NSString stringWithFormat:@"%@|%@", self.cosRegionInfo.region,
                                                     self.cosRegionInfo.domain]);
     // After the request is completed, set the QUIC timeout to the default
-    [QCloudQuicConfig shareConfig].total_timeout_millisec_ = UPLOAD_TIME_OUT_SEC * 1000;
+    [self.quicProxy setTotalTimeoutMillisec:UPLOAD_TIME_OUT_SEC * 1000];
     
     VodLogInfo(@"preUploadResult, domain:%@,isQuic:%d,costTime:%f", self.cosRegionInfo.domain, self.cosRegionInfo.isQuic, self.minCosRespTime);
     [self reportPublishOptResult:TVC_UPLOAD_EVENT_ID_DETECT_DOMAIN_RESULT

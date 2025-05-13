@@ -28,4 +28,10 @@
 
 + (NSString *)tvc_getDevUUID;
 
++ (id)findObj:(NSDictionary*)dic withKey:(NSString*)key withClass:(Class)claz withDet:(id)obj;
+
++ (id)findObj:(NSDictionary*)dic withKey:(NSString*)key withClass:(Class)claz;
+
++ (id)findObjForce:(NSDictionary*)dic withKey:(NSString*)key withClass:(Class)claz;
+
 @end

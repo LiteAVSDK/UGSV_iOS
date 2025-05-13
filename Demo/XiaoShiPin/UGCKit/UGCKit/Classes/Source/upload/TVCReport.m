@@ -86,7 +86,7 @@ static TVCReport *_shareInstance = nil;
         for (TVCReportInfo *obj in self.reportCaches) {
             if (obj.retryCount < 4) {
                 if (obj.reporting == NO) {
-                    [self report:obj];
+                    [self report:obj withDomain:TXUPLOAD_REPORT_URL];
                 }
             } else {
                 [delList addObject:obj];
@@ -96,7 +96,7 @@ static TVCReport *_shareInstance = nil;
     }
 }
 
-- (void)report:(TVCReportInfo *)info {
+- (void)report:(TVCReportInfo *)info withDomain:(NSString*)reqUrl {
     NSMutableDictionary *dictParam = [[NSMutableDictionary alloc] init];
     [dictParam setValue:TVCVersion forKey:@"version"];
     [dictParam setValue:[NSNumber numberWithInt:info.reqType] forKey:@"reqType"];
@@ -142,9 +142,12 @@ static TVCReport *_shareInstance = nil;
     }
 
     // set url
-    NSString *baseUrl = @"https://vodreport.qcloud.com/ugcupload_new";
+    __block NSString *blockUrl = reqUrl;
+    __block TVCReportInfo *blockInfo = info;
+    NSString *baseUrl = [NSString stringWithFormat:@"%@/%@", reqUrl, @"ugcupload_new"];
 
     // create request
+    VodLogInfo(@"reportUGCEvent->request url:%@ body:%@", baseUrl, dictParam);
     NSMutableURLRequest *request =
         [NSMutableURLRequest requestWithURL:[NSURL URLWithString:baseUrl]];
     [request setValue:[NSString stringWithFormat:@"%ld", (long)[bodyData length]]
@@ -169,6 +172,11 @@ static TVCReport *_shareInstance = nil;
                 [ws delReportInfo:info];
             } else {
                 info.reporting = NO;
+                if (![TXUPLOAD_REPORT_URL_BAK isEqualToString:blockUrl]) {
+                    [self report:blockInfo withDomain:TXUPLOAD_REPORT_URL_BAK];
+                } else {
+                    VodLogError(@"upload report failed, error:%@, code:%d", error, httpResponse.statusCode);
+                }
             }
           }];
     [initTask resume];

@@ -210,7 +210,7 @@
 }
 
 - (BOOL)isResumeUploadVideo:(TVCUploadContext *)uploadContext withSessionKey:(NSString *)vodSessionKey
-            withFileModTime:(uint64_t)videoLastModTime withCoverModTime:(uint64_t)coverLastModTime
+            withFileModTime:(uint64_t)videoLastModTime withCoverModTime:(uint64_t)coverLastModTime 
           uploadSesssionKey:(NSString*)uploadSesssionKey{
     return uploadContext.resumeData && uploadContext.resumeData.length > 0 && uploadContext && vodSessionKey && vodSessionKey.length > 0;
 }
@@ -299,7 +299,7 @@
         NSString *sResumeData = [resumeData base64EncodedStringWithOptions:0];
         [resumeDataDic setValue:sResumeData forKey:sessionKey];
     }
-
+    
     NSData *newSessionJsonData = [NSJSONSerialization dataWithJSONObject:sessionDic options:0 error:&jsonErr];
     NSData *newTimeJsonData = [NSJSONSerialization dataWithJSONObject:timeDic options:0 error:&jsonErr];
     NSData *newLastModTimeJsonData = [NSJSONSerialization dataWithJSONObject:lastModTimeDic options:0 error:&jsonErr];

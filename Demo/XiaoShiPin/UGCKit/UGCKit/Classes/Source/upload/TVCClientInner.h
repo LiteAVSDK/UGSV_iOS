@@ -8,6 +8,21 @@
 
 #import "TVCHeader.h"
 
+#define VOD_SERVER_DOMESTIC_HOST @"uploadsignal.vodplayvideo.net"
+#define VOD_SERVER_DOMESTIC_HOST_BAK @"uploadsignal.vodplayvideo.com"
+#define VOD_SERVER_INTL_HOST @"uploadsignal.vodglcdn.com"
+#define VOD_SERVER_INTL_HOST_BAK @"uploadsignal.vod-common.com"
+
+//#define VOD_REPORT_DOMESTIC_HOST @"https://uploadreport.vodplayvideo.net"
+//#define VOD_REPORT_DOMESTIC_HOST_BAK @"https://uploadreport.vodplayvideo.com"
+//#define VOD_REPORT_INTL @"https://uploadreport.vodglcdn.com"
+//#define VOD_REPORT_INTL_BAK @"https://uploadreport.vod-common.com"
+
+#define VOD_REPORT_DOMESTIC_HOST @"https://vodreport.qcloud.com"
+#define VOD_REPORT_DOMESTIC_HOST_BAK @"https://vodreport.qcloud.com"
+#define VOD_REPORT_INTL @"https://vodreport.qcloud.com"
+#define VOD_REPORT_INTL_BAK @"https://vodreport.qcloud.com"
+
 
 #define UGC_HOST        @"vod2.qcloud.com"
 #define UGC_HOST_BAK    @"vod2.dnsv1.com"
@@ -21,13 +36,20 @@
 #define kMessage        @"message"
 #define kData           @"data"
 
-#define TVCVersion @"1.2.4.0"
+#define TVCVersion @"1.2.7.0"
 
 #pragma mark - COS config
 // Field deprecated, used as a placeholder field for InitUploadUGC
 #define kRegion @"gz"
 // Timeout
 #define kTimeoutInterval 20
+
+static NSString *VOD_SERVER_HOST = VOD_SERVER_DOMESTIC_HOST;
+static NSString *VOD_SERVER_HOST_BAK = VOD_SERVER_DOMESTIC_HOST_BAK;
+
+#define TXQCloudRaceTypeOnlyQUIC 0
+#define TXQCloudRaceTypeQUICHTTP 1
+#define TXQCloudRaceTypeOnlyHTTP 2
 
 @interface TVCUGCResult : NSObject
 
@@ -58,6 +80,8 @@
 @property(nonatomic,strong) NSString * domain;
 
 @property(atomic,assign) int useCosAcc;
+
+@property (nonatomic, strong) NSString* uploadDomain;       // complete domain
 
 @property(nonatomic,strong) NSString * cosAccDomain;
 

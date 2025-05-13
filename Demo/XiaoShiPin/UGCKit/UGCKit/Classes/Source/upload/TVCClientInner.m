@@ -32,6 +32,7 @@
         _useCosAcc = 0;
         _cosAccDomain = @"";
         _currentTS = 0;
+        _uploadDomain = @"";
     }
     return self;
 }

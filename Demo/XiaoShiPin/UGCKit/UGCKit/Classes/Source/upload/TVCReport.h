@@ -10,6 +10,9 @@
 #import <Foundation/Foundation.h>
 #import "TVCClientInner.h"
 
+static NSString* TXUPLOAD_REPORT_URL = VOD_REPORT_DOMESTIC_HOST;
+static NSString* TXUPLOAD_REPORT_URL_BAK = VOD_REPORT_DOMESTIC_HOST_BAK;
+
 @interface TVCReport : NSObject
 
 + (instancetype)shareInstance;

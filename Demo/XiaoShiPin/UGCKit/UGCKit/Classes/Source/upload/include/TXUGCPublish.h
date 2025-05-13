@@ -55,4 +55,10 @@
  */
 - (void)setIsDebug:(bool)isDebug;
 
+/**
+ set host env type
+ @param envType TXUploadEnv
+ */
++ (void)setEnvConfig:(TXUploadEnv)envType;
+
 @end

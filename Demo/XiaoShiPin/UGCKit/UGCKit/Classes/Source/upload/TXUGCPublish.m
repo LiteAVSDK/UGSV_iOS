@@ -6,6 +6,7 @@
 #import "UploadResumeDefaultController.h"
 #import "TVCConfig.h"
 #import "TVCLog.h"
+#import "TVCReport.h"
 
 #undef _MODULE_
 #define _MODULE_ "TXUGCPublish"
@@ -398,6 +399,24 @@
             [self.delegate onPublishComplete:result];
         }
     });
+}
+
++ (void)setEnvConfig:(TXUploadEnv)envType {
+    if (envType == ENV_DOMESTIC) {
+        txUploadEvnType = envType;
+        VOD_SERVER_HOST = VOD_SERVER_DOMESTIC_HOST;
+        VOD_SERVER_HOST_BAK = VOD_SERVER_DOMESTIC_HOST_BAK;
+        TXUPLOAD_REPORT_URL = VOD_REPORT_DOMESTIC_HOST;
+        TXUPLOAD_REPORT_URL_BAK = VOD_REPORT_DOMESTIC_HOST_BAK;
+    } else if (envType == ENV_INTL) {
+        txUploadEvnType = envType;
+        VOD_SERVER_HOST = VOD_SERVER_INTL_HOST;
+        VOD_SERVER_HOST_BAK = VOD_SERVER_INTL_HOST_BAK;
+        TXUPLOAD_REPORT_URL = VOD_REPORT_INTL;
+        TXUPLOAD_REPORT_URL_BAK = VOD_REPORT_INTL_BAK;
+    } else {
+        VodLogError(@"unknown env type: %d", envType);
+    }
 }
 
 @end

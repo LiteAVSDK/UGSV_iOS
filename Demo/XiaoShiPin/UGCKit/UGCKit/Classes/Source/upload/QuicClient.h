@@ -6,7 +6,6 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "TquicConnection.h"
 
 NS_ASSUME_NONNULL_BEGIN
 typedef void (^TXUGCQuicCompletion)(UInt64 cosTs,NSString* domain,NSString* region,BOOL isQuic);

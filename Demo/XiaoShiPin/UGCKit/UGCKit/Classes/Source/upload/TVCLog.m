@@ -14,7 +14,7 @@
     static TVCLog *vodLogger = nil;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        vodLogger = [TVCLog new];
+        vodLogger = [[TVCLog alloc] init];
     });
     return vodLogger;
 }

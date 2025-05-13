@@ -8,6 +8,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+
 /**
  * Short video publishing result error code definition, short video publishing process is divided into three steps:
  *  step1: Request to upload file
@@ -195,5 +196,16 @@ typedef NS_ENUM(NSInteger, TXMediaPublishResultCode)
 /// 媒体地址
 @property (nonatomic, strong) NSString*             mediaURL;
 @end
+
+typedef NS_ENUM(NSInteger, TXUploadEnv) {
+    /// evn for DOMESTIC
+    /// 国内环境
+    ENV_DOMESTIC,
+    /// env for INTL
+    /// 国际环境
+    ENV_INTL
+};
+
+static TXUploadEnv txUploadEvnType = ENV_DOMESTIC;
 
 #endif

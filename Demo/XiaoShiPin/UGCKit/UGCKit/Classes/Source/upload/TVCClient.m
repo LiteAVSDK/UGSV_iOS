@@ -21,9 +21,11 @@
 #include <sys/socket.h>
 #include <sys/types.h>
 #import "QuicClient.h"
-#import "QCloudQuicConfig.h"
 #import "TVCConfig.h"
 #import "TVCLog.h"
+#import "TVCUtils.h"
+#import "TVCCOSXMLEndPoint.h"
+#import "TVCQuicConfigProxy.h"
 
 #define TVCUGCUploadCosKey                  @"ugc_upload"
 
@@ -58,6 +60,7 @@
 // The last modified time of the current uploaded breakpoint video cover file
 @property(atomic,assign) uint64_t coverLastModTime;
 @property(atomic, assign) BOOL cancelFlag;
+@property (atomic, strong) TVCQuicConfigProxy *quicConfig;
 @end
 
 @implementation TVCClient
@@ -80,6 +83,7 @@
         self.coverLastModTime = 0;
         self.cancelFlag = NO;
         self.uploadSesssionKey = uploadSesssionKey;
+        self.quicConfig = [[TVCQuicConfigProxy alloc] init];
         [self updateConfig:config];
     }
     return self;
@@ -710,7 +714,8 @@
         ugc.useCosAcc = [[cosAcc objectForKey:@"isOpen"] intValue];
         ugc.cosAccDomain = [cosAcc objectForKey:@"domain"];
     }
-
+    ugc.uploadDomain = [TVCUtils findObj:dataDict withKey:@"storageUploadDomain" withClass:[NSString class]];
+    
     self.cosVideoPath = ugc.videoPath;
     uploadContext.cugResult = ugc;
 
@@ -736,7 +741,7 @@
 
     // 2.Start uploading
     uploadContext.reqTime = [[NSDate date] timeIntervalSince1970] * 1000;
-    if ([self.config.uploadResumController isResumeUploadVideo:uploadContext
+    if (self.config.enableResume && [self.config.uploadResumController isResumeUploadVideo:uploadContext
                                                 withSessionKey:vodSessionKey withFileModTime:self.videoLastModTime
                                               withCoverModTime:self.coverLastModTime
                                              uploadSesssionKey:self.uploadSesssionKey]) {
@@ -779,15 +784,15 @@
     */
     if([[TXUGCPublishOptCenter shareInstance] isNeedEnableQuic:uploadContext.cugResult.uploadRegion]){
         configuration.enableQuic = true;
-        [QCloudQuicConfig shareConfig].total_timeout_millisec_ = UPLOAD_TIME_OUT_SEC * 1000;
-        [QCloudQuicConfig shareConfig].connect_timeout_millisec_ = UPLOAD_CONNECT_TIME_OUT_MILL;
-        [QCloudQuicConfig shareConfig].race_type = QCloudRaceTypeOnlyQUIC;
-        [QCloudQuicConfig shareConfig].is_custom = NO;
-        [QCloudQuicConfig shareConfig].port = 443;
+        [self.quicConfig setTotalTimeoutMillisec:UPLOAD_TIME_OUT_SEC * 1000];
+        [self.quicConfig setConnectTimeoutMillisec:UPLOAD_CONNECT_TIME_OUT_MILL];
+        [self.quicConfig setRaceType:TXQCloudRaceTypeOnlyQUIC];
+        [self.quicConfig setIsCustom:NO];
+        [self.quicConfig setPort:443];
     }else{
         configuration.enableQuic = false;
-        [QCloudQuicConfig shareConfig].port = 80;
-        [QCloudQuicConfig shareConfig].race_type = QCloudRaceTypeOnlyHTTP;
+        [self.quicConfig setPort:80];
+        [self.quicConfig setRaceType:TXQCloudRaceTypeOnlyHTTP];
     }
     uploadContext.isQuic = configuration.enableQuic;
 
@@ -796,9 +801,9 @@
     configuration.appID = uploadContext.cugResult.uploadAppid;
     configuration.signatureProvider = self;
     configuration.timeoutInterval = UPLOAD_TIME_OUT_SEC;
-
+    
     NSString *accDomain = uploadContext.cugResult.cosAccDomain;
-    QCloudCOSXMLEndPoint *endpoint;
+    TVCCOSXMLEndPoint *endpoint;
     // Whether to enable dynamic acceleration
     if (uploadContext.cugResult.useCosAcc == 1 && accDomain && accDomain.length > 0) {
         NSString *accUrl = accDomain;
@@ -809,28 +814,51 @@
                 accUrl = [@"http://" stringByAppendingString:accDomain];
             }
         }
-        endpoint = [[QCloudCOSXMLEndPoint alloc] initWithLiteralURL:[NSURL URLWithString:accUrl]];
+        endpoint = [[TVCCOSXMLEndPoint alloc] initWithLiteralURL:[NSURL URLWithString:accUrl]];
         endpoint.regionName = uploadContext.cugResult.uploadRegion;
         [self queryIpWithDomain:accUrl];
     } else {
-        endpoint = [[QCloudCOSXMLEndPoint alloc] init];
-        endpoint.regionName = uploadContext.cugResult.uploadRegion;
-        NSString *reqHost = [endpoint serverURLWithBucket:uploadContext.cugResult.uploadBucket appID:uploadContext.cugResult.uploadAppid
-                                               regionName:uploadContext.cugResult.uploadRegion]
-            .host;
-        if (!self.config.enableHttps) {
-            [self queryIpWithDomain:reqHost];
-            NSArray *ipList = [[TXUGCPublishOptCenter shareInstance] query:reqHost];
-            NSString *ip = nil;
-            if (ipList && ipList.count > 0) {
-                ip = ipList[0];
+        if (uploadContext.cugResult.uploadDomain) {
+            endpoint = [[TVCCOSXMLEndPoint alloc] init];
+            endpoint.mCosFormat = TVC_FORMAT_REGION;
+            endpoint.regionName = uploadContext.cugResult.uploadDomain;
+            NSString *reqHost = [endpoint serverURLWithBucket:uploadContext.cugResult.uploadBucket appID:uploadContext.cugResult.uploadAppid
+                                                   regionName:uploadContext.cugResult.uploadDomain]
+                .host;
+            if (!self.config.enableHttps) {
+                [self queryIpWithDomain:reqHost];
+                NSArray *ipList = [[TXUGCPublishOptCenter shareInstance] query:reqHost];
+                NSString *ip = nil;
+                if (ipList && ipList.count > 0) {
+                    ip = ipList[0];
+                }
+                if (ip) {
+                    [[QCloudHttpDNS shareDNS] setIp:ip forDomain:reqHost];
+                }
+                configuration.disableGlobalHTTPDNSPrefetch = NO;
+            } else {
+                configuration.disableGlobalHTTPDNSPrefetch = YES;
             }
-            if (ip) {
-                [[QCloudHttpDNS shareDNS] setIp:ip forDomain:reqHost];
-            }
-            configuration.disableGlobalHTTPDNSPrefetch = NO;
         } else {
-            configuration.disableGlobalHTTPDNSPrefetch = YES;
+            endpoint = [[TVCCOSXMLEndPoint alloc] init];
+            endpoint.regionName = uploadContext.cugResult.uploadRegion;
+            NSString *reqHost = [endpoint serverURLWithBucket:uploadContext.cugResult.uploadBucket appID:uploadContext.cugResult.uploadAppid
+                                                   regionName:uploadContext.cugResult.uploadRegion]
+                .host;
+            if (!self.config.enableHttps) {
+                [self queryIpWithDomain:reqHost];
+                NSArray *ipList = [[TXUGCPublishOptCenter shareInstance] query:reqHost];
+                NSString *ip = nil;
+                if (ipList && ipList.count > 0) {
+                    ip = ipList[0];
+                }
+                if (ip) {
+                    [[QCloudHttpDNS shareDNS] setIp:ip forDomain:reqHost];
+                }
+                configuration.disableGlobalHTTPDNSPrefetch = NO;
+            } else {
+                configuration.disableGlobalHTTPDNSPrefetch = YES;
+            }
         }
     }
     
@@ -919,7 +947,7 @@
 
                 [videoUpload setInitMultipleUploadFinishBlock:^(
                     QCloudInitiateMultipartUploadResult *multipleUploadInitResult, QCloudCOSXMLUploadObjectResumeData resumeData) {
-                    if (multipleUploadInitResult != nil && resumeData != nil) {
+                    if (isResumeUpload && multipleUploadInitResult != nil && resumeData != nil) {
                         [self setSession:cug.uploadSession resumeData:resumeData lastModTime:uploadContext.videoLastModTime
                             coverLastModTime:uploadContext.coverLastModTime
                                 withFilePath:param.videoPath];
@@ -1238,7 +1266,7 @@
                                 if (uploadContext.mainVodServerErrMsg != nil && uploadContext.mainVodServerErrMsg.length > 0) {
                                     initResp.descMsg = [NSString stringWithFormat:@"%@|%@", initResp.descMsg, uploadContext.mainVodServerErrMsg];
                                 }
-
+                                
                                 [self txReport:TVC_UPLOAD_EVENT_ID_FINISH errCode:initResp.retCode vodErrCode:error.code cosErrCode:@"" errInfo:initResp.descMsg
                                        reqTime:uploadContext.reqTime
                                    reqTimeCost:reqTimeCost
@@ -1254,7 +1282,7 @@
                                   cosRequestId:@""
                             cosTcpConnTimeCost:0
                            cosRecvRespTimeCost:0];
-
+                                
                                 [self notifyResult:result resp:initResp];
                             }
                         }
@@ -1416,7 +1444,7 @@
 // "TVCMultipartResumeExpireTimeKey": {filePath1: expireTime1, filePath2: expireTime2, filePath3: expireTime3}
 // session的过期时间是1天
 - (NSString *)getSessionFromFilepath:(TVCUploadContext *)uploadContext {
-    ResumeCacheData *cacheData = [self.config.uploadResumController
+    ResumeCacheData *cacheData = [self.config.uploadResumController 
                                   getResumeData:uploadContext.uploadParam.videoPath
                                   uploadSesssionKey:self.uploadSesssionKey];
     if(cacheData != nil) {

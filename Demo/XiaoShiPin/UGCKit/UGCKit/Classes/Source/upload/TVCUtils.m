@@ -445,5 +445,24 @@ static NSString *tvc_combineTwoFingerPrint(unsigned char *fp1,unsigned char *fp2
     return deviceModel;
 }
 
++ (id)findObj:(NSDictionary*)dic withKey:(NSString*)key withClass:(Class)claz withDet:(id)obj {
+    id value = [self findObj:dic withKey:key withClass:claz];
+    return value ? value : obj;
+}
+
++ (id)findObj:(NSDictionary*)dic withKey:(NSString*)key withClass:(Class)claz {
+    if (dic[key] && [dic[key]isKindOfClass: claz]) {
+        return dic[key];
+    }
+    return nil;
+}
+
++ (id)findObjForce:(NSDictionary*)dic withKey:(NSString*)key withClass:(Class)claz {
+    if (dic[key] && [dic[key]isKindOfClass: claz]) {
+        return dic[key];
+    }
+    @throw [NSException exceptionWithName:NSInvalidArgumentException reason:[NSString stringWithFormat:@"no value for %@", key] userInfo:@{}];
+}
+
 @end
 

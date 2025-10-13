@@ -31,34 +31,29 @@ TODO: Add long description of the pod here.
   s.ios.framework    = ['SystemConfiguration','CoreTelephony', 'VideoToolbox', 'CoreGraphics', 'AVFoundation', 'Accelerate','AssetsLibrary']
   s.ios.library = 'z', 'resolv', 'iconv', 'stdc++', 'c++', 'sqlite3'
 
-  s.subspec "Professional" do |ss|
+  def self.add_common_subspec_settings(ss)
     ss.resources      = 'UGCKit/Assets/**/*'
     ss.source_files = 'UGCKit/Classes/**/*.{h,m}'
     framework_path="../../../SDK/TXLiteAVSDK_Professional.framework"
     xcframework_path="../../../SDK/TXLiteAVSDK_Professional.xcframework/ios-arm64_armv7/TXLiteAVSDK_Professional.framework"
     ss.pod_target_xcconfig={
         'HEADER_SEARCH_PATHS'=> [
-          "$(PODS_TARGET_SRCROOT)/#{framework_path}/Headers",
-          "$(PODS_TARGET_SRCROOT)/../../../SDK/TXLiteAVSDK_UGC.framework/Headers","$(PODS_TARGET_SRCROOT)/#{xcframework_path}/Headers"
+          "$(PODS_TARGET_SRCROOT)/#{framework_path}/Headers","$(PODS_TARGET_SRCROOT)/#{xcframework_path}/Headers"
         ]
     }
     ss.resource_bundles = {
       'UGCKitResources' => ['UGCKit/Localizable/**/*','UGCKit/Assets/**/*.{png,xcassets,bundle,storyboard,xib}']
     }
   end
-
-  s.subspec "UGC" do |ss|
-    ss.resources      = 'UGCKit/Assets/**/*'
-    ss.source_files   = 'UGCKit/Classes/**/*.{h,m}'
-    framework_path="../../../SDK/TXLiteAVSDK_UGC.framework"
-    xcframework_path="../../../SDK/TXLiteAVSDK_UGC.xcframework/ios-arm64_armv7/TXLiteAVSDK_UGC.framework"
-    ss.pod_target_xcconfig = {
-        'HEADER_SEARCH_PATHS' => ["$(PODS_TARGET_SRCROOT)/#{framework_path}/Headers","$(PODS_TARGET_SRCROOT)/#{xcframework_path}/Headers"]
-    }
-    ss.resource_bundles = {
-      'UGCKitResources' => ['UGCKit/Localizable/**/*','UGCKit/Assets/**/*.{png,xcassets,bundle,storyboard,xib}']
-    }
+  
+  s.subspec "Professional" do |ss|
+    add_common_subspec_settings(ss)
   end
+  
+  s.subspec "UGC" do |ss|
+    add_common_subspec_settings(ss)
+  end
+
   s.dependency 'BeautySettingKit'
   s.dependency 'xmagickit'
   s.dependency 'QCloudQuic','6.3.9'

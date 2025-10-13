@@ -9,7 +9,7 @@ end
 
 target 'XiaoShiPinApp' do
   pod "AFNetworking"
-  tx_UGCKit 'UGC'
+  tx_UGCKit 'Professional'
   pod 'BeautySettingKit', :path => 'BeautySettingKit/BeautySettingKit.podspec'
   pod 'xmagickit', :path => 'xmagickit/xmagickit.podspec'
   pod "MJRefresh"

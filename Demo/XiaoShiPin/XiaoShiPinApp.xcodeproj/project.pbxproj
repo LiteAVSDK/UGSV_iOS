@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		0380445A2B47DA4E0085BE24 /* BuildFile in Frameworks */ = {isa = PBXBuildFile; };
 		1726EFBE2769DD4300C8E597 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 453DE2BF2379458C0083E759 /* Assets.xcassets */; };
+		3673AF6A14C8B773DA1A09E9 /* TXLiteAVSDK_Professional.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = ABC5CD0A5EDCDB56AC88A0A6 /* TXLiteAVSDK_Professional.xcframework */; };
 		400443652837B61F00DAA0DE /* TXFFmpeg.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 400443642837B61E00DAA0DE /* TXFFmpeg.xcframework */; };
 		400443662837B61F00DAA0DE /* TXFFmpeg.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 400443642837B61E00DAA0DE /* TXFFmpeg.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		400443692837B62600DAA0DE /* TXSoundTouch.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 400443682837B62600DAA0DE /* TXSoundTouch.xcframework */; };
@@ -68,7 +69,6 @@
 		6E650F2427DB379100D37497 /* DetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6E650F2327DB379100D37497 /* DetailViewController.m */; };
 		6E650F2927DB490100D37497 /* SettingViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6E650F2827DB490100D37497 /* SettingViewController.m */; };
 		6E650F2C27DB4F1500D37497 /* DeleteAccountViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6E650F2B27DB4F1500D37497 /* DeleteAccountViewController.m */; };
-		BA11D070720E37CD1C5AF4AB /* TXLiteAVSDK_UGC.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 421205D667D280035CF28C21 /* TXLiteAVSDK_UGC.xcframework */; };
 		BC42E64A1F750919B895C9AF /* Pods_XiaoShiPinApp.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 64C5E080F5371855F071110B /* Pods_XiaoShiPinApp.framework */; };
 /* End PBXBuildFile section */
 
@@ -96,7 +96,6 @@
 		40E96181283BB0A400D4C80F /* Metal.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Metal.framework; path = System/Library/Frameworks/Metal.framework; sourceTree = SDKROOT; };
 		40E96183283BB0E800D4C80F /* MetalKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MetalKit.framework; path = System/Library/Frameworks/MetalKit.framework; sourceTree = SDKROOT; };
 		40E96185283BB38800D4C80F /* CoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreServices.framework; path = System/Library/Frameworks/CoreServices.framework; sourceTree = SDKROOT; };
-		421205D667D280035CF28C21 /* TXLiteAVSDK_UGC.xcframework */ = {isa = PBXFileReference; includeInIndex = 1; name = TXLiteAVSDK_UGC.xcframework; path = ../../SDK/TXLiteAVSDK_UGC.xcframework; sourceTree = "<group>"; };
 		453DE2B02379458A0083E759 /* XiaoShiPinApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = XiaoShiPinApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		453DE2B32379458A0083E759 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		453DE2B42379458A0083E759 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -199,6 +198,7 @@
 		6E650F2B27DB4F1500D37497 /* DeleteAccountViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DeleteAccountViewController.m; sourceTree = "<group>"; };
 		7216AF6672BE96A755F9A006 /* Pods-XiaoShiPinApp.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-XiaoShiPinApp.release.xcconfig"; path = "Target Support Files/Pods-XiaoShiPinApp/Pods-XiaoShiPinApp.release.xcconfig"; sourceTree = "<group>"; };
 		8C0241A1CF41E8DFFB38B885 /* Pods-XiaoShiPinApp.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-XiaoShiPinApp.debug.xcconfig"; path = "Target Support Files/Pods-XiaoShiPinApp/Pods-XiaoShiPinApp.debug.xcconfig"; sourceTree = "<group>"; };
+		ABC5CD0A5EDCDB56AC88A0A6 /* TXLiteAVSDK_Professional.xcframework */ = {isa = PBXFileReference; includeInIndex = 1; name = TXLiteAVSDK_Professional.xcframework; path = ../../SDK/TXLiteAVSDK_Professional.xcframework; sourceTree = "<group>"; };
 		CA1752BBB634FB42BC710760 /* Pods-XiaoShiPinApp.dailybuild.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-XiaoShiPinApp.dailybuild.xcconfig"; path = "Target Support Files/Pods-XiaoShiPinApp/Pods-XiaoShiPinApp.dailybuild.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -220,7 +220,7 @@
 				455AAEEB237ABBAA00AF4A3C /* libc++.tbd in Frameworks */,
 				BC42E64A1F750919B895C9AF /* Pods_XiaoShiPinApp.framework in Frameworks */,
 				40E96186283BB38800D4C80F /* CoreServices.framework in Frameworks */,
-				BA11D070720E37CD1C5AF4AB /* TXLiteAVSDK_UGC.xcframework in Frameworks */,
+				3673AF6A14C8B773DA1A09E9 /* TXLiteAVSDK_Professional.xcframework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -306,7 +306,7 @@
 				455AAEEC237ABBAE00AF4A3C /* libresolv.tbd */,
 				455AAEEA237ABBAA00AF4A3C /* libc++.tbd */,
 				64C5E080F5371855F071110B /* Pods_XiaoShiPinApp.framework */,
-				421205D667D280035CF28C21 /* TXLiteAVSDK_UGC.xcframework */,
+				ABC5CD0A5EDCDB56AC88A0A6 /* TXLiteAVSDK_Professional.xcframework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";

@@ -15,9 +15,9 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>12.8.0</string>
+	<string>12.9.0</string>
 	<key>CFBundleVersion</key>
-	<string>8590</string>
+	<string>8866</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSAppTransportSecurity</key>

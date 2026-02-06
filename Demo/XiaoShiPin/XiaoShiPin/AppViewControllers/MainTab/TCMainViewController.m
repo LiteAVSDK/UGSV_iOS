@@ -403,7 +403,7 @@ typedef NS_ENUM(NSInteger, TCVideoAction) {
 {
     UGCKitMediaPickerConfig *config = [[UGCKitMediaPickerConfig alloc] init];
     config.mediaType = UGCKitMediaTypePhoto;
-    config.minItemCount = 3;
+    config.minItemCount = 1;
     config.maxItemCount = NSIntegerMax;
     UGCKitMediaPickerViewController *imagePickerController = [[UGCKitMediaPickerViewController alloc] initWithConfig:config theme:_theme];
     TCNavigationController *nav = [[TCNavigationController alloc] initWithRootViewController:imagePickerController];

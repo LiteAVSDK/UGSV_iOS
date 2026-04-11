@@ -55,7 +55,7 @@ TODO: Add long description of the pod here.
   end
 
   s.dependency 'BeautySettingKit'
-  s.dependency 'xmagickit'
+  s.dependency 'TEBeautyKit'
   s.dependency 'QCloudQuic','6.3.9'
   s.dependency 'QCloudCOSXML/Slim','6.4.4'
   s.dependency 'AFNetworking','4.0.1'

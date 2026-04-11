@@ -5,7 +5,7 @@
 
 #import "TCMenuItemCell.h"
 #if POD_PITU
-#import "ZipArchive.h"
+#import <ZipArchive/ZipArchive.h>
 #endif
 
 #import <objc/message.h>

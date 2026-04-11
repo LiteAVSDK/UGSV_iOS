@@ -22,12 +22,13 @@
 #import <Masonry/Masonry.h>
 #import "UGCKitReporterInternal.h"
 #import "SDKHeader.h"
-#import "BeautyView.h"
+#import <TEBeautyKit/TEPanelView.h>
+#import <TEBeautyKit/TEUIConfig.h>
 #import <XMagic/XMagic.h>
 #import <OpenGLES/EAGL.h>
 #import <OpenGLES/ES2/gl.h>
 #import <OpenGLES/ES2/glext.h>
-#import <YTCommonXMagic/yt_auth_apple.h>
+//#import <YTCommonXMagic/yt_auth_apple.h>
 #define ScreenWidth                         [[UIScreen mainScreen] bounds].size.width
 static const CGFloat BUTTON_CONTROL_SIZE = 40;
 static const CGFloat AudioEffectViewHeight = 150;
@@ -86,7 +87,7 @@ typedef NS_ENUM(NSInteger, RecordState) {
 <TXUGCRecordListener, UIGestureRecognizerDelegate,
 MPMediaPickerControllerDelegate,TCBGMControllerListener,TXVideoJoinerListener,
 UGCKitVideoRecordMusicViewDelegate,UGCKitAudioEffectPanelDelegate,YTSDKEventListener,
-YTSDKLogListener,TXVideoCustomProcessDelegate,TXVideoCustomProcessListener,BeautyLoadPituDelegate
+YTSDKLogListener,TXVideoCustomProcessDelegate,TXVideoCustomProcessListener,BeautyLoadPituDelegate,TEPanelViewDelegate
 #if POD_PITU
 , MCCameraDynamicDelegate
 #endif
@@ -143,7 +144,6 @@ YTSDKLogListener,TXVideoCustomProcessDelegate,TXVideoCustomProcessListener,Beaut
     SpeedMode                 _speedMode;
     
     TCBeautyPanel *      _vBeauty;      //基础美颜
-    BeautyView *         _vTXBeauty;    //高级美颜
     UGCKitProgressHUD*        _hud;
     CGFloat                   _bgmBeginTime;
     BOOL                      _bgmRecording;
@@ -172,7 +172,9 @@ YTSDKLogListener,TXVideoCustomProcessDelegate,TXVideoCustomProcessListener,Beaut
 @property (nonatomic, assign) BOOL initData;  //initData
 @property (strong, nonatomic) UGCKitRecordPreviewController *previewController;
 //xmagic对象
-@property(nonatomic, strong) XMagic *xMagicKit;  //xmagic对象
+@property (nonatomic, strong) XMagic *xMagicKit;  //xmagic对象
+@property (nonatomic, strong) TEBeautyKit *teBeautyKit; //TEBeautyKit对象
+@property (nonatomic, strong) TEPanelView *tePanelView; //高级美颜;
 //提示信息
 @property(nonatomic, strong) UILabel *tipsLabel;  //提示信息
 @property(nonatomic, strong) NSLock  *lock;
@@ -220,46 +222,39 @@ YTSDKLogListener,TXVideoCustomProcessDelegate,TXVideoCustomProcessListener,Beaut
         [_lock unlock];
         return texture;
     }
-    if(!_xMagicKit) {
+    if (!_xMagicKit) {
         [self buildBeautySDK:(int)width and:(int)height texture:texture];
         self.lastRenderWidth = width;
         self.lastRenderHeight = height;
     }
-   if(_xMagicKit != nil && (self.lastRenderHeight != height || self.lastRenderWidth != width) ) {
-       [_xMagicKit setRenderSize:CGSizeMake(width, height)];
-       self.lastRenderWidth = width;
-       self.lastRenderHeight = height;
-   }
-   if (self.bgmPlaying && !self.audioMute) {
-       [self.xMagicKit setAudioMute:YES];
-       self.audioMute = YES;
-   }
-   YTProcessInput *input = [[YTProcessInput alloc] init];
-   input.textureData = [[YTTextureData alloc] init];
-   input.textureData.texture = texture;
-   input.textureData.textureWidth = width;
-   input.textureData.textureHeight = height;
-   input.dataType = kYTTextureData;
-
-   EAGLContext* cloudContext = [EAGLContext currentContext];
-   EAGLContext* xmagicContext = [self.xMagicKit getCurrentGlContext];
-
-   if(cloudContext != xmagicContext){
-       [EAGLContext setCurrentContext: xmagicContext];
-   }
-
-   YTProcessOutput *output =[self.xMagicKit process:input withOrigin:YtLightImageOriginTopLeft withOrientation:YtLightCameraRotation0];
-
-   [_lock unlock];
-   if(cloudContext != xmagicContext){
-       [EAGLContext setCurrentContext: cloudContext];
-   }
-
-  return output.textureData.texture;
+    if (_xMagicKit != nil && (self.lastRenderHeight != height || self.lastRenderWidth != width) ) {
+        [_xMagicKit setRenderSize:CGSizeMake(width, height)];
+        self.lastRenderWidth = width;
+        self.lastRenderHeight = height;
+    }
+    if (self.bgmPlaying && !self.audioMute) {
+        [self.xMagicKit setAudioMute:YES];
+        self.audioMute = YES;
+    }
+    
+    EAGLContext* cloudContext = [EAGLContext currentContext];
+    EAGLContext* xmagicContext = [self.xMagicKit getCurrentGlContext];
+    
+    if (cloudContext != xmagicContext) {
+        [EAGLContext setCurrentContext: xmagicContext];
+    }
+    YTProcessOutput *output = [self.teBeautyKit processTexture:texture textureWidth:width textureHeight:height withOrigin:YtLightImageOriginTopLeft withOrientation:YtLightCameraRotation0];
+    [_lock unlock];
+    if(cloudContext != xmagicContext){
+        [EAGLContext setCurrentContext: cloudContext];
+    }
+    return output.textureData.texture;
 }
 
 - (void)onTextureDestoryed {
-    [self removeXMagic];
+    if (self.xMagicKit) {
+        [self.xMagicKit onPause];
+    }
 }
 
 - (void)onLog:(YtSDKLoggerLevel) loggerLevel withInfo:(NSString * _Nonnull) logInfo{
@@ -289,49 +284,16 @@ YTSDKLogListener,TXVideoCustomProcessDelegate,TXVideoCustomProcessListener,Beaut
 }
 //HB构建SDK，初始化接口
 - (void)buildBeautySDK:(int)width and:(int)height texture:(unsigned)textureID {
-
-    NSString *beautyConfigPath = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject];
-    beautyConfigPath = [beautyConfigPath stringByAppendingPathComponent:@"beauty_config.json"];
-    NSFileManager *localFileManager=[[NSFileManager alloc] init];
-    BOOL isDir = YES;
-    NSDictionary * beautyConfigJson = @{};
-    if ([localFileManager fileExistsAtPath:beautyConfigPath isDirectory:&isDir] && !isDir) {
-        NSString *beautyConfigJsonStr = [NSString stringWithContentsOfFile:beautyConfigPath encoding:NSUTF8StringEncoding error:nil];
-        NSError *jsonError;
-        NSData *objectData = [beautyConfigJsonStr dataUsingEncoding:NSUTF8StringEncoding];
-        beautyConfigJson = [NSJSONSerialization JSONObjectWithData:objectData
-        options:NSJSONReadingMutableContainers error:&jsonError];
-    }
-    NSDictionary *assetsDict = @{@"core_name":@"LightCore.bundle",
-            @"root_path":[[NSBundle mainBundle] bundlePath],
-            @"plugin_3d":@"Light3DPlugin.bundle",
-            @"plugin_hand":@"LightHandPlugin.bundle",
-            @"plugin_segment":@"LightSegmentPlugin.bundle",
-
-            @"beauty_config":beautyConfigJson
-    };
-
-    // Init beauty kit
-    self.xMagicKit = [[XMagic alloc] initWithRenderSize:CGSizeMake(width,height) assetsDict:assetsDict];
-    // Register log
-    [self.xMagicKit registerSDKEventListener:self];
-    [self.xMagicKit registerLoggerListener:self withDefaultLevel:YT_SDK_ERROR_LEVEL];
-    //去掉磨皮
-    [self.xMagicKit configPropertyWithType:@"beauty" withName:@"beauty.smooth" withData:@"0.0" withExtraInfo:nil];
-
-//    _vTXBeauty.beautyKitRef = self.xMagicKit;
-    [_vTXBeauty setXMagic:self.xMagicKit];
-    _vTXBeauty.viewController = self;
     __weak __typeof(self)weakSelf = self;
-    _vTXBeauty.itemSelectedBlock = ^() {
-        __strong typeof(self) strongSelf = weakSelf;
-        dispatch_async(dispatch_get_main_queue(), ^{
-            __strong typeof(self) strongSelf = weakSelf;
-            strongSelf.tipsLabel.hidden = YES;
-        });
-    };
-    [_vTXBeauty updateAllBeautyValue];
-    [_vTXBeauty setSavedBeautyProperty];
+    [TEBeautyKit createXMagic:EFFECT_MODE_PRO onInitListener:^(TEBeautyKit * _Nullable beautyKit) {
+        __strong typeof(self)strongSelf = weakSelf;
+        strongSelf.teBeautyKit = beautyKit;
+        strongSelf.xMagicKit = beautyKit.xmagicApi;
+        strongSelf.tePanelView.teBeautyKit = strongSelf.teBeautyKit;
+        [strongSelf.tePanelView setDefaultBeauty];
+        [strongSelf.teBeautyKit setLogLevel:YT_SDK_ERROR_LEVEL];
+        [strongSelf.teBeautyKit registerSDKEventListener:strongSelf];
+    }];
 }
 
 - (instancetype)initWithConfig:(UGCKitRecordConfig *)config theme:(UGCKitTheme *)theme
@@ -693,6 +655,34 @@ YTSDKLogListener,TXVideoCustomProcessDelegate,TXVideoCustomProcessListener,Beaut
 #pragma mark ---- Video Beauty UI ----
 -(void)initTXBeautyUI
 {
+    NSBundle *bundle = [NSBundle mainBundle];
+    NSString *beautyJsonPath = [bundle pathForResource:@"beauty" ofType:@"json"];
+    NSString *beautyShapeJsonPath = [bundle pathForResource:@"beauty_shape" ofType:@"json"];
+    NSString *beautyImageJsonPath = [bundle pathForResource:@"beauty_image" ofType:@"json"];
+    NSString *beautyMakeupJsonPath = [bundle pathForResource:@"beauty_makeup" ofType:@"json"];
+    NSString *lutJsonPath = [bundle pathForResource:@"lut" ofType:@"json"];
+    NSString *beautyBodyJsonPath = [bundle pathForResource:@"beauty_body" ofType:@"json"];
+    NSString *motion2dJsonPath = [bundle pathForResource:@"motion_2d" ofType:@"json"];
+    NSString *motion3dJsonPath = [bundle pathForResource:@"motion_3d" ofType:@"json"];
+    NSString *motionHandJsonPath = [bundle pathForResource:@"motion_gesture" ofType:@"json"];
+    NSString *makeupJsonPath = [bundle pathForResource:@"makeup" ofType:@"json"];
+    NSString *segmentationJsonPath = [bundle pathForResource:@"segmentation" ofType:@"json"];
+    
+    NSMutableArray *resArray = [[NSMutableArray alloc] init];
+    [resArray addObject:@{TEUI_BEAUTY : beautyJsonPath}];
+    [resArray addObject:@{TEUI_BEAUTY_SHAPE : beautyShapeJsonPath}];
+    [resArray addObject:@{TEUI_BEAUTY_IMAGE : beautyImageJsonPath}];
+    [resArray addObject:@{TEUI_BEAUTY_MAKEUP : beautyMakeupJsonPath}];
+    [resArray addObject:@{TEUI_LUT : lutJsonPath}];
+    [resArray addObject:@{TEUI_BEAUTY_BODY : beautyBodyJsonPath}];
+    [resArray addObject:@{TEUI_MOTION_2D : motion2dJsonPath}];
+    [resArray addObject:@{TEUI_MOTION_3D : motion3dJsonPath}];
+    [resArray addObject:@{TEUI_MOTION_GESTURE : motionHandJsonPath}];
+    [resArray addObject:@{TEUI_MAKEUP : makeupJsonPath}];
+    [resArray addObject:@{TEUI_SEGMENTATION : segmentationJsonPath}];
+    /// 设置资源
+    [[TEUIConfig shareInstance] setTEPanelViewResources:resArray];
+    
     UIEdgeInsets gSafeInset;
 #if __IPHONE_11_0 && __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_11_0
     if(gSafeInset.bottom > 0){
@@ -707,19 +697,15 @@ YTSDKLogListener,TXVideoCustomProcessDelegate,TXVideoCustomProcessListener,Beaut
 
     dispatch_async(dispatch_get_main_queue(), ^{
         //美颜选项界面
-        _vTXBeauty = [[BeautyView alloc] init];
-        [self.view addSubview:_vTXBeauty];
-        [_vTXBeauty mas_makeConstraints:^(MASConstraintMaker *make) {
-            make.width.mas_equalTo(self.view);
-            make.centerX.mas_equalTo(self.view);
-            make.height.mas_equalTo(254);
-            if(gSafeInset.bottom > 0.0){  // 适配全面屏
-                make.bottom.mas_equalTo(self.view.mas_bottom).mas_offset(0);
-            } else {
-                make.bottom.mas_equalTo(self.view.mas_bottom).mas_offset(-10);
-            }
+        self.tePanelView = [[TEPanelView alloc] init];
+        self.tePanelView.delegate = self;
+        self.tePanelView.hidden = YES;
+        [self.view addSubview:self.tePanelView];
+        [self.tePanelView mas_makeConstraints:^(MASConstraintMaker *make) {
+            make.width.bottom.mas_equalTo(self.view);
+            make.left.right.mas_equalTo(self.view);
+            make.height.mas_equalTo(230 + gSafeInset.bottom);
         }];
-        _vTXBeauty.hidden = YES;
     });
 }
 
@@ -898,7 +884,7 @@ YTSDKLogListener,TXVideoCustomProcessDelegate,TXVideoCustomProcessListener,Beaut
 
 - (IBAction)onBtnMusicClicked:(id)sender
 {
-    _vTXBeauty.hidden = YES;
+    self.tePanelView.hidden = YES;
     UIView *musicView = [self musicView];
     if (_BGMPath) {
         musicView.hidden = !musicView.hidden;
@@ -964,7 +950,7 @@ YTSDKLogListener,TXVideoCustomProcessDelegate,TXVideoCustomProcessListener,Beaut
     [self hideBottomView:YES];
     UGCKitAudioEffectPanel *soundMixView = [self soundMixView];
     soundMixView.hidden = NO;
-    _vTXBeauty.hidden = YES;
+    self.tePanelView.hidden = YES;
     _musicView.hidden = YES;
 
     CATransition *animation = [CATransition animation];
@@ -1017,7 +1003,7 @@ YTSDKLogListener,TXVideoCustomProcessDelegate,TXVideoCustomProcessListener,Beaut
     [_lock lock];
     _vTXBeautyShow = !_vTXBeautyShow;
     _musicView.hidden = YES;
-    _vTXBeauty.hidden = !_vTXBeautyShow;
+    self.tePanelView.hidden = !_vTXBeautyShow;
     [self hideBottomView:_vTXBeautyShow];
     _btnTips.hidden = !_vTXBeautyShow;
     if (_vTXBeautyShow) {
@@ -1753,7 +1739,7 @@ YTSDKLogListener,TXVideoCustomProcessDelegate,TXVideoCustomProcessListener,Beaut
         {
             [self showBeauty];
         }
-        if (NO == CGRectContainsPoint(_vTXBeauty.frame, touchPoint) && _vTXBeautyShow)
+        if (NO == CGRectContainsPoint(self.tePanelView.frame, touchPoint) && _vTXBeautyShow)
         {
             [self showTXBeauty];
         }

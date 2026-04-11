@@ -16,7 +16,7 @@
 #import "TCUtil.h"
 #import <Bugly/Bugly.h>
 #import "SDKHeader.h"
-#import <XMagic/TELicenseCheck.h>
+#import <YTCommonXMagic/TELicenseCheck.h>
 
 @interface AppDelegate ()
 

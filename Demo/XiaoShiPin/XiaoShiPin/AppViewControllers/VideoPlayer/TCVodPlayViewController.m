@@ -420,7 +420,7 @@ typedef NS_ENUM(NSInteger,DragDirection){
         if (cfg == nil) {
             cfg = [TXVodPlayConfig new];
         }
-        cfg.cacheFolderPath = [[NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingString:@"/txcache"];
+        cfg.cacheFolderPath = [[NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingString:@"/txplayerfiles"];
         cfg.maxCacheItems = 5;
         voidPlayer.config = cfg;
         
